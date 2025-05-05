@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "heatmap"
+dynamic = ["version"]
+authors = [
+  { name="Autumn Muhly", email="amuhly@email.sc.edu" },
+]
+description = "Speak like snakes and bees."
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering"
+]
+
+dependencies = [
+    "requests"
+]
+
+[project.urls]
+Homepage = "https://github.com/autumnmuhly/heatmap"
+Documentation = "https://heatmap.readthedocs.io"
+Repository = "https://github.com/autumnmuhly/heatmap"
+Issues = "https://github.com/autumnmuhly/heatmap/issues"
+
+[project.scripts]
+"sounds_outside" = "heatmap.sounds_outside:main"
+"snake" = "heatmap.snake:main"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+    ]
+
+[tool.hatch.version]
+path = "src/heatmap/__init__.py"
+[tool.hatch.build.targets.wheel]
+packages = ["src/heatmap"]
