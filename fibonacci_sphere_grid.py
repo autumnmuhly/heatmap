@@ -4,7 +4,7 @@ from distaz import DistAz
 from math import radians, cos, sin, asin, sqrt, pi
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D 
-
+from heatmap_classes import Gridpoint
 def fibonacci_sphere(number_points):
     #https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
     points = []
@@ -86,20 +86,7 @@ for i in range(len(x_com)):
 
 
 
-
-class Gridpoint:
-    def __init__(self,lat,lon,x_cart,y_cart,z_cart):
-        self.lat=lat
-        self.lon=lon
-        self.x_cart=x_cart
-        self.y_cart=y_cart
-        self.z_cart=z_cart
-        self.phaseCount = {}
-    def distToSta(self, sta):
-        return DistAz(self.lat,self.lon,sta.lat,sta.lon)
-
-
-
+#This line loads in gridpoints
 fib_grid=Gridpoint(gridpoints_lat,gridpoints_lon,x_com,y_com,z_com)
 
 # different distance
@@ -111,45 +98,18 @@ def dist3d(x1,y1,z1,x2,y2,z2):
     return distance
 
 
-#look at distances between points 
-distance_first=10000
-distance_second=10000
-distance_third=10000
-distance_fourth=10000
-distance_fifth=10000
-distance_sixth=1000
-for i in range(len(fib_grid.x_cart)):
-    #distance=DistAz(fib_grid.lat[40],fib_grid.lon[40],fib_grid.lat[i],fib_grid.lat[i])
-    distance=dist3d(fib_grid.x_cart[9],fib_grid.y_cart[9],fib_grid.z_cart[9],fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i])
-    #print(distance)
-    distance=abs(distance)
-    #print(distance)
-    if distance < distance_first:
-        if distance !=0:
-            first_neighbor=[fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i]]
-            distance_first=distance
-    elif distance<distance_second :
-        #second_neighbor=[fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i]]
-        distance_second=distance
-    elif distance<distance_third :
-        #third_neighbor=[fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i]]
-        distance_third=distance
-    elif distance<distance_fourth :
-        #fourth_neighbor=[fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i]]
-        distance_fourth=distance
-    elif distance<distance_fifth :
-        #fifth_neighbor=[fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i]]
-        distance_fifth=distance
 
 
-def find_neighbors(how_many):
+def find_neighbors(how_many,reference):
     #trying to do neighbor search but with a list that we are comparing 
-    neighbors=np.ones((len(fib_grid.x_cart),2)).tolist()
-    neighbors[0][0]=100000
     neighbors = []
     #print(neighbors)
     for i in range(len(fib_grid.x_cart)):
-        distance=dist3d(fib_grid.x_cart[9],fib_grid.y_cart[9],fib_grid.z_cart[9],fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i])
+        #not great circle distance
+        #distance=dist3d(fib_grid.x_cart[reference],fib_grid.y_cart[reference],fib_grid.z_cart[reference],fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i])
+        #this is great circle distance - doesnt matter at this small of values 
+        distance=DistAz(fib_grid.lat[reference],fib_grid.lon[reference],fib_grid.lat[i],fib_grid.lon[i])
+        distance=distance.delta
         #print(f' this is the distance {distance}')
         if distance != 0:
             #print('possible')
@@ -167,25 +127,25 @@ def find_neighbors(how_many):
 
 # this is how many closests points to keep
 HOW_MANY=5
-neighbors = find_neighbors(HOW_MANY)
+reference=100
+neighbors = find_neighbors(HOW_MANY,reference)
 print(neighbors)
-    
-
-
 
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(x_com, y_com, z_com, color='green', s=2)
-#ax.scatter(first_neighbor[0],first_neighbor[1],first_neighbor[2], color='pink',s=100)
 for i in range(HOW_MANY):
     index=neighbors[i][1]
-    ax.scatter(x_com[index],y_com[index],z_com[index],color='pink',s=100)
-#ax.scatter(second_neighbor[0],second_neighbor[1],second_neighbor[2], color='pink',s=100)
-#ax.scatter(third_neighbor[0],third_neighbor[1],third_neighbor[2], color='pink',s=100)
-#ax.scatter(fourth_neighbor[0],fourth_neighbor[1],fourth_neighbor[2], color='pink',s=100)
-#ax.scatter(fifth_neighbor[0],fifth_neighbor[1],fifth_neighbor[2], color='pink',s=100)
-ax.scatter(fib_grid.x_cart[9], fib_grid.y_cart[9], fib_grid.z_cart[9], color='yellow', s=100)
+    x_n=fib_grid.x_cart[index]
+    y_n=fib_grid.y_cart[index]
+    z_n=fib_grid.z_cart[index]
+    ax.scatter(x_n,y_n,z_n, color='pink',s=100)
+ax.scatter(fib_grid.x_cart[reference], fib_grid.y_cart[reference], fib_grid.z_cart[reference], color='yellow', s=100)
 ax.set_box_aspect([radius_of_earth,radius_of_earth,radius_of_earth])
 ax.legend()
 plt.show()
+
+
+#I want to find the average grid spacing between the points
+
