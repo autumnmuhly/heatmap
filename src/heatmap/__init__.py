@@ -1,8 +1,9 @@
 __version__="0.0.1"
 
-from .mesh_create import find_neighbors,cart_latlon,latlon_cartesian,fibonacci_sphere
-from gridpoint import Gridpoint
-from distaz import DistAz
+from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
+from .mesh_setup import latlon_cartesian,cart_latlon
+from .gridpoint import Gridpoint
+from .distaz import DistAz
 
 __all__=[
     "find_neighbors",
@@ -10,5 +11,6 @@ __all__=[
     "latlon_cartesian",
     "fibonacci_sphere",
     "Gridpoint",
-    "DistAsz"
+    "DistAsz",
+    "create_gridpoint"
 ]

@@ -20,7 +20,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "requests"
+    "numpy",
+    "matplotlib"
 ]
 
 [project.urls]

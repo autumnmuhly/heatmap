@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from distaz import DistAz
+from .distaz import DistAz
 from math import radians, cos, sin, asin, sqrt, pi
 
 def fibonacci_sphere(number_points):
