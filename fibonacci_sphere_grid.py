@@ -165,6 +165,7 @@ def find_neighbors(how_many):
         neighbors = neighbors[:how_many]
     return neighbors
 
+# this is how many closests points to keep
 HOW_MANY=5
 neighbors = find_neighbors(HOW_MANY)
 print(neighbors)
