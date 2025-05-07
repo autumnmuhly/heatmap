@@ -7,6 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from .gridpoint import Gridpoint
 from .mesh_setup import fibonacci_sphere
 from .mesh_setup import find_neighbors,cart_latlon
+
 def create_gridpoint(number_points):
     radius_of_earth=6378 
     points=(fibonacci_sphere(number_points))*radius_of_earth
@@ -37,7 +38,9 @@ def create_gridpoint(number_points):
         gridpoints_geodetic=cart_latlon(x_com[i],y_com[i],z_com[i])
         gridpoints_lat.append(gridpoints_geodetic[0])
         gridpoints_lon.append(gridpoints_geodetic[1])
-
-    #This line loads in gridpoins as a class :)
-    fib_grid=Gridpoint(gridpoints_lat,gridpoints_lon,x_com,y_com,z_com)
+    #configure to be a tuple 
+    fib_grid=[]
+    for i in range(len(x_com)):
+        cart=(x_com[i],y_com[i],z_com[i])
+        fib_grid.append(Gridpoint(cart))
     return fib_grid

@@ -3,6 +3,12 @@ import math
 from .distaz import DistAz
 from math import radians, cos, sin, asin, sqrt, pi
 
+class Cartesian:
+    def __init__(self,x,y,z):
+        self.x=x
+        self.y=y
+        self.z=z
+
 def fibonacci_sphere(number_points):
     #https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
     points = []
@@ -22,6 +28,7 @@ def fibonacci_sphere(number_points):
 
     return np.array(points)
 
+
 def cart_latlon(x, y, z):
     A=6378
     # calculate longitude, in radians
@@ -40,7 +47,9 @@ def latlon_cartesian(lat,lon):
     x = R*np.cos(lat)*np.cos(lon)
     y = R*np.cos(lat)*np.sin(lon)
     z = R*np.sin(lat)
-    return x,y,z
+    return Cartesian(x,y,z)
+
+
 
 #This function will find the nearest neighbors for any 3D grid 
 def find_neighbors(how_many,reference,grid):
