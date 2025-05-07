@@ -13,7 +13,7 @@ __all__=[
     "Gridpoint",
     "Station",
     "EQ",
-    "DistAsz",
+    "DistAz",
     "Location",
     "create_gridpoint"
 ]
