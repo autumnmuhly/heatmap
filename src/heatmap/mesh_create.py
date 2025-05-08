@@ -38,9 +38,11 @@ def create_gridpoint(number_points):
         gridpoints_geodetic=cart_latlon(x_com[i],y_com[i],z_com[i])
         gridpoints_lat.append(gridpoints_geodetic[0])
         gridpoints_lon.append(gridpoints_geodetic[1])
+    
     #configure to be a tuple 
     fib_grid=[]
     for i in range(len(x_com)):
-        cart=(x_com[i],y_com[i],z_com[i])
-        fib_grid.append(Gridpoint(cart))
+        point=(x_com[i],y_com[i],z_com[i])
+        grid=Gridpoint(point)
+        fib_grid.append(grid)
     return fib_grid
