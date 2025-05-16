@@ -165,6 +165,25 @@ print(f'The radius of each grid point {radius_point}km')
 #Calculate distance between points 
 
 
+""""""""""
 
-
-
+eq_yes=dict()
+station_yes=dict()
+max_value=0
+for pt in grid_array:
+    count=0
+    for evt in eq_list:
+            dist=heatmap.DistAz(evt.loc.lat,evt.loc.lon,pt.loc.lat,pt.loc.lon)
+            gc=dist.delta
+            if min_dis<gc<max_dis:
+                count+=1
+                for sta in station_list:
+                     dis_pt_sta=heatmap.DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
+                     pt_sta=dis_pt_sta.delta
+                     count_array=0
+                     if pt_sta<=radius_point_deg:
+                          if sta.start<evt.time<sta.stop:
+                               count_array+=1
+                     station_yes[pt]=count_array
+    eq_yes[pt]=count
+"""""""""

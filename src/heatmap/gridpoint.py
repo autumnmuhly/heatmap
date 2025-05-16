@@ -67,10 +67,10 @@ def is_ok_eq_sta(evt,sta,distRange):
         gc=dist.delta
         if min_dist<gc<max_dist:
             return True
-        else:
-            print("not ok distance eq_sta")
-    else:
-        print(f'not ok time eq_sta {sta.start} {evt.time} {sta.stop}')
+        #else:
+            #print("not ok distance eq_sta")
+    #else:
+        #print(f'not ok time eq_sta {sta.start} {evt.time} {sta.stop}')
     return False
 
 class Array:
@@ -89,10 +89,10 @@ class Array:
             for sta in self.sta_list:
                 if is_ok_eq_sta(evt,sta,distRange) == True:
                     self.eqcount +=1
-                else:
-                    print(f"not ok sta {evt} {sta}")
-        else:
-            print(f"not ok gp {self.pt}")
+                #else:
+                    #print(f"not ok sta {evt} {sta}")
+        #else:
+            #print(f"not ok gp {self.pt}")
 
 def form_array(sta_list,pt,radius):    
     sta_array_list=[]
@@ -101,7 +101,7 @@ def form_array(sta_list,pt,radius):
         pt_sta=dist.delta
         if pt_sta<=radius:
             sta_array_list.append(sta)
-            print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
+            #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
     return Array(pt,radius,sta_array_list)
 
 def form_all_array(sta_list,grid_array,radius,minSta):
