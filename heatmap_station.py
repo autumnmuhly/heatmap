@@ -28,8 +28,8 @@ radius_of_earth=6378
 
 #List of phases- Will add more 
 if phase == 'SKS':
-    min_dis=0
-    max_dis=65
+    min_dis=80
+    max_dis=120
 
 
 #Get complete grid points and scale to Earth - come up with what is a reasonable number. why 1000? spacing should represent array size
@@ -45,11 +45,12 @@ station_lat=df[3].astype(float).to_numpy()
 station_lon=df[4].astype(float).to_numpy()
 station_start=pd.to_datetime(df[7]).to_list()
 station_end=pd.to_datetime(df[8]).to_list()
+station_name=df[1].to_list()
 #need to check for NA or empty ???
 
 station_list=[]
 for i in range(len(station_lat)):
-    sta=heatmap.Station(heatmap.Location(station_lat[i],station_lon[i]),station_start[i],station_end[i])
+    sta=heatmap.Station(station_name,heatmap.Location(station_lat[i],station_lon[i]),station_start[i],station_end[i])
     station_list.append(sta)
 print('made it station ')
 
@@ -79,10 +80,8 @@ for sta in station_list:
         if sta.start<evt.time<sta.stop:
             dist=heatmap.DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lat)
             gc=dist.delta
-            print(f'gcarc distance betwen {sta} and {evt} is {gc}')
             if min_dis<gc<max_dis:
                 count+=1
-                print('we added one')
     eq_yes[sta]=count
     max_value=max(count,max_value)
 
@@ -94,22 +93,21 @@ south_pole=heatmap.Location(-90,0)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 norm=plt.Normalize(0,max_value)
-
+print('starting to plot sta')
 for sta in station_list:
-    print(eq_yes[sta])
-    station_scatter=ax.scatter(sta.loc.cart.x, sta.loc.cart.y, sta.loc.cart.z, c=eq_yes[sta], cmap = cm.cool, norm=norm, alpha=1, s=50)
+    station_scatter=ax.scatter(sta.loc.cart.x, sta.loc.cart.y, sta.loc.cart.z, c=eq_yes[sta], cmap = cm.cool, norm=norm, alpha=1, s=10)
 cbar = fig.colorbar(station_scatter)
-cbar.set_label('Number of earthquakes in SKS range', rotation=90)
+cbar.set_label('Number of stations in SKS range', rotation=90)
 #ax.scatter(x_com, y_com, z_com, color='green', s=2)
-
+print('startig to plot eq')
 for evt in eq_list:
     ax.scatter(evt.loc.cart.x,evt.loc.cart.y,evt.loc.cart.z,color='red',s=100)
 
 ax.scatter(north_pole.cart.x,north_pole.cart.y,north_pole.cart.z,color='yellow',s=100)
 ax.scatter(south_pole.cart.x,south_pole.cart.y,south_pole.cart.z, color='yellow',s=100, label='North and South Pole')
 
-for pt in grid_array:
-    ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],color='blue',s=2)
+#for pt in grid_array:
+    #ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],color='blue',s=2)
 ax.set_box_aspect([radius_of_earth,radius_of_earth,radius_of_earth])
 
 #plot on 2D map 
@@ -123,15 +121,15 @@ ax.add_feature(cfeature.LAND, color="oldlace")
 #ax.set_extent([-85.5, -80.5, 37, 41], crs=ccrs.PlateCarree())
 gridlines=ax.gridlines(draw_labels=True, alpha=.80)
 for sta in station_list:    
-    station_scatter=plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=50, c=eq_yes[sta],cmap=cm.cool, transform=ccrs.PlateCarree())
+    station_scatter=plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=10, c=eq_yes[sta],cmap=cm.cool, norm=norm, transform=ccrs.PlateCarree())
 cbar = fig.colorbar(station_scatter)
-cbar.set_label('Number of earthquakes in SKS range', rotation=90)
+cbar.set_label('Number of stations in SKS range', rotation=90)
 for evt in eq_list:
     plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=50,color='#06470c')
-for pt in grid_array:
-    plt.scatter(pt.loc.lon,pt.loc.lat,marker='o',s=2,color='blue')
+#for pt in grid_array:
+    #plt.scatter(pt.loc.lon,pt.loc.lat,marker='o',s=2,color='blue')
 
-#plt.show()
+plt.show()
 
 
 #find distance betweent two grid points 

@@ -28,9 +28,29 @@ radius_of_earth=6378
 
 #List of phases- Will add more 
 if phase == 'SKS':
-    min_dis=0
-    max_dis=65
+    min_dis=62
+    max_dis=142
+elif phase == 'SKKS':
+    min_dis=85
+    max_dis=170
+elif phase =='S3KS':
+    min_dis=110
+    max_dis=175
+elif phase =='S4KS':
+    min_dis=130
+    max_dis=175
+else:
+    print('add phase to list')
 
+#S S 50 96
+#SKScd SKiKS 80 120
+#SKIKS SKIKS 142 160
+#PKS PKS 131 145
+#Sdiff Sdiff 97 170
+#SKS SKS 62 142
+#SKKS SKKS 85 170
+#S3KS SKKKS 110 175
+#S4KS SKKKKS 130 175
 
 #Get complete grid points and scale to Earth - come up with what is a reasonable number. why 1000? spacing should represent array size
 
@@ -38,20 +58,24 @@ grid_array=heatmap.create_gridpoint(number_points)
 
 print('made it to the grid')
 #Now lets load in our station data  
-os.chdir('/Users/autumnmuhly/Work/outercore/programs/SmKS/scriptsdir/heatmap_scripts') #gonna have to change this to be current working directory 
-df = pd.read_csv('test_stations.txt', sep=" ", header=None)
+os.chdir('/Users/autumnmuhly/Work/outercore/programs/SmKS/eventdir/adept/info') #gonna have to change this to be current working directory 
+df = pd.read_csv('All_stations.txt', sep=" ", header=None)
 df = df.iloc[1:]  #Have to get rid of first row cause its a second header 
 station_lat=df[3].astype(float).to_numpy()
 station_lon=df[4].astype(float).to_numpy()
 station_start=pd.to_datetime(df[7]).to_list()
 station_end=pd.to_datetime(df[8]).to_list()
+station_name=df[1].to_list()
 #need to check for NA or empty ???
 
 station_list=[]
 for i in range(len(station_lat)):
-    sta=heatmap.Station(heatmap.Location(station_lat[i],station_lon[i]),station_start[i],station_end[i])
+    sta=heatmap.Station(station_name,heatmap.Location(station_lat[i],station_lon[i]),station_start[i],station_end[i])
     station_list.append(sta)
-print('made it station ')
+print('loaded in stations')
+
+
+
 
 
 #now we want to go through our list of earthquakes and if our phase of interest doesn't exist there we want to get rid of that station 
@@ -66,7 +90,7 @@ eq_list=[]
 for i in range(len(events_lat)):
     eq=heatmap.EQ(heatmap.Location(events_lat[i],events_lon[i]),event_time[i])
     eq_list.append(eq)
-
+print('Loaded in events')
 
 #each station will get a point if an earthquake occurs in the right distance, in the right time frame
 #eq_yes=[0]*(len(station_lat))
@@ -83,6 +107,7 @@ for pt in grid_array:
     max_value=max(count,max_value)
 
 #Plot on sphere of earth
+print('starting to plot')
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 norm=plt.Normalize(0,max_value)
@@ -114,13 +139,13 @@ ax.add_feature(cfeature.OCEAN, color='lightskyblue')
 ax.add_feature(cfeature.LAND, color="oldlace")
 gridlines=ax.gridlines(draw_labels=True, alpha=.80)
 for sta in station_list:    
-    plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=50, color='tomato')
+    plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=10, color='tomato')
     
 for evt in eq_list:
     plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=50,color='#06470c')
 
-for pt in grid_array:
-    print(eq_yes[pt])
+#for pt in grid_array:
+    #print(eq_yes[pt])
     
 for pt in grid_array:
     pt_scatter=plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=2, c=eq_yes[pt],cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
