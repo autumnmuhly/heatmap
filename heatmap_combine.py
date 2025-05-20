@@ -1,6 +1,5 @@
 #combine station and gridpoint for heatmap
 import os
-import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -9,7 +8,8 @@ from math import radians, cos, sin, asin, sqrt, pi
 from mpl_toolkits.mplot3d import Axes3D
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from datetime import date
+import datetime
+import sys
 import heatmap
 
 #THIS IS WHERE YOU CAN DECIDED WHICH PHASES YOU ARE INTERESTED IN 
@@ -27,7 +27,7 @@ radius_of_earth=6378
 
 #List of phases- Will add more 
 if phase == 'SKS':
-    dist=(10,20)
+    dist=(0,30)
 elif phase == 'SKKS':
     dist=(85,170)
 elif phase =='S3KS':
@@ -49,11 +49,12 @@ print('loaded in sta data')
 area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
 radius_point_km=sqrt(area_per_point/pi)
 radius_point_deg=radius_point_km/111
-
+print(radius_of_earth)
 #form arrays
+print(datetime.datetime.now())
 min_station=1
-array_list=heatmap.form_all_array(station_list,grid_array,2,min_station)
-
+array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
+print(datetime.datetime.now())
 #now we want to load in our earthquake data
 eq_list=heatmap.read_earthquakes_adept('test_earthquakes.txt')
 print('loaded in eq data')
@@ -70,14 +71,18 @@ print('finished arr-evt calculation')
 min_eq_needed=1
 good_arrays=[]
 for arr in array_list:
-    if arr.eqcount>min_eq_needed:
+    print(arr.eqcount)
+    if arr.eqcount>=min_eq_needed:
         good_arrays.append(arr)
-
-
+        
 #some formatting things for our colorbar
 eq_count=[]
 for arr in good_arrays:
     eq_count.append(arr.eqcount)
+#need to put something here in case eq_count is empty
+if len(eq_count)<1:
+    print('there are no eq within range. change eq list')
+    sys.exit()
 max_value=max(eq_count)
 
 print(eq_count)
@@ -132,4 +137,4 @@ for arr in good_arrays:
  #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value   
 cbar=fig.colorbar(arr_scatter)
 cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
-#plt.show()
+plt.show()

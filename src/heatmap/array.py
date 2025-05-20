@@ -7,7 +7,7 @@ def is_ok_eq_sta(evt,sta,distRange):
     max_dist=distRange[1]
     if sta.start<evt.time<sta.stop:
         dist=DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lon)
-        gc=dist.delta
+        gc=abs(dist.delta)
         if min_dist<gc<max_dist:
             #print(f'this eq and sta are okay {evt},{sta}')
             return True
@@ -25,15 +25,23 @@ class Array:
         self.sta_list=sta_list 
         self.eqcount=0
         self.stacde=[]
+        self.eqpair=[]
     def check_eq(self,evt,distRange):
         "checks if any events are within range from array, if so count 1 for that array"
         min=distRange[0]
         max=distRange[1]
         dist=DistAz(self.pt.loc.lat,self.pt.loc.lon,evt.loc.lat,evt.loc.lon)
-        if dist.delta>min and dist.delta<max:
+        distance=abs(dist.delta)
+        if distance>min and distance<max:
+            self.truth_count=0
             for sta in self.sta_list:
                 if is_ok_eq_sta(evt,sta,distRange) == True:
-                    self.eqcount +=1
+                    self.truth_count+=1
+                    print(f'this is truth count {self.truth_count} and this is len of sta_list {len(self.sta_list)}')
+                    if self.truth_count == len(self.sta_list):
+                        print('they are equal')
+                        self.eqcount +=1 #needs to be changed. i think that it should be for evt in evt_list
+                        self.eqpair.append(evt)
                 #else:
                     #print(f"not ok sta {evt} {sta}")
         #else:
@@ -57,3 +65,4 @@ def form_all_array(sta_list,grid_array,radius,minSta):
             array_list.append(array)
     return array_list
 
+# create a class of earthquake array pairs for each earthquake
