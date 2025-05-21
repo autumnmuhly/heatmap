@@ -50,7 +50,27 @@ area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
 radius_point_km=sqrt(area_per_point/pi)
 radius_point_deg=radius_point_km/111
 print(radius_of_earth)
+
+
+min_station=10
+print(f"attemp array form arrays for min {min_station} station in {radius_point_deg} deg")
+
+
+array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
+
+print(f"formed {len(array_list)} arrays for min {min_station} station in {radius_point_deg} deg")
+
+heatmap.save_arrays_json("arrays.json", array_list)
+
+
+if len(array_list) == 0:
+    print(f"no arrays pass for radius {radius_point_deg} deg with  min {min_station} stations")
+    sys.exit(1)
+
+
 #form arrays
+
+
 print(datetime.datetime.now())
 min_station=1
 array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
