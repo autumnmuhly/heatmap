@@ -74,9 +74,12 @@ for arr in array_list:
     print(arr.eqcount)
     if arr.eqcount>=min_eq_needed:
         good_arrays.append(arr)
-        
+
+if len(good_arrays) == 0:
+    print(f"no arrays pass min eq {min_eq_needed} for radius {radius_point_deg} deg")
+
 #some formatting things for our colorbar
-eq_count=[]
+eq_count=[0,1]
 for arr in good_arrays:
     eq_count.append(arr.eqcount)
 #need to put something here in case eq_count is empty
