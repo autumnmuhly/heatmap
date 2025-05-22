@@ -16,11 +16,11 @@ def test_spacing():
     max_spacing=max(spacing)
     #assert min_spacing <2.6
     #assert max_spacing<5
-    #add in the average grid spacing 
+    #add in the average grid spacing
     #print(f'this is the min {min_spacing} and this is the max {max_spacing}, diff is {max_spacing-min_spacing}')
-    
+
 def test_spacing():
-    #changing fib grid to be a grid that we do know 
+    #changing fib grid to be a grid that we do know
     HOW_MANY=5
     reference=100
     number_points=1000
@@ -31,11 +31,11 @@ def test_spacing():
     y_com=[]
     z_com=[]
     for i in range(len(lat)):
-        x,y,z=heatmap.latlon_cartesian(lat[i],lon[i])
-        x_com.append(x)
-        y_com.append(y)
-        z_com.append(z)
-    fib_grid=Gridpoint(lat,lon,x_com,y_com,z_com)
+        cartesian=heatmap.latlon_cartesian(lat[i],lon[i])
+        x_com.append(cartesian.x)
+        y_com.append(cartesian.y)
+        z_com.append(cartesian.z)
+    fib_grid=heatmap.Gridpoint(lat,lon,x_com,y_com,z_com)
     neighbors = heatmap.find_neighbors(HOW_MANY,reference,fib_grid)
     spacing=[]
     for i in range(number_points):
@@ -46,5 +46,5 @@ def test_spacing():
     max_spacing=max(spacing)
     #assert min_spacing <2.6
     #assert max_spacing<5
-    #add in the average grid spacing 
+    #add in the average grid spacing
     print(f'this is the min {min_spacing} and this is the max {max_spacing}, diff is {max_spacing-min_spacing}')
