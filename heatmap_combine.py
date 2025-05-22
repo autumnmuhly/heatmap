@@ -25,7 +25,7 @@ number_points=1000
 radius_of_earth=6378
 
 
-#List of phases- Will add more 
+#List of phases- Will add more
 if phase == 'SKS':
     dist=(0,30)
 elif phase == 'SKKS':
@@ -41,7 +41,7 @@ else:
 
 grid_array=heatmap.create_gridpoint(number_points)
 
-#Now lets load in our station data  
+#Now lets load in our station data
 #need to check for NA or empty ???
 station_list=heatmap.read_stations_adept('test_stations_lat.txt')
 print('loaded in sta data')
@@ -79,7 +79,7 @@ print(datetime.datetime.now())
 eq_list=heatmap.read_earthquakes_adept('test_earthquakes.txt')
 print('loaded in eq data')
 
-#loop over evts and arrays and check if distance range is met 
+#loop over evts and arrays and check if distance range is met
 print('starting arr-evt calculation')
 for arr in array_list:
     for evt in eq_list:
@@ -138,7 +138,7 @@ ax.set_box_aspect([radius_of_earth,radius_of_earth,radius_of_earth])
 cbar = fig.colorbar(arr_scatter)
 cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
 
-#plot on 2D map 
+#plot on 2D map
 print('starting to plot 2D')
 plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -146,9 +146,9 @@ ax = plt.axes(projection=ccrs.PlateCarree())
 ax.add_feature(cfeature.OCEAN, color='lightskyblue')
 ax.add_feature(cfeature.LAND, color="oldlace")
 gridlines=ax.gridlines(draw_labels=True, alpha=.80)
-for sta in station_list:    
+for sta in station_list:
     plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=10, color='tomato')
-    
+
 for evt in eq_list:
     plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='#06470c')
 
@@ -157,7 +157,7 @@ for pt in grid_array:
 
 for arr in good_arrays:
     arr_scatter=plt.scatter(arr.pt.loc.lon,arr.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
- #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value   
+ #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value
 cbar=fig.colorbar(arr_scatter)
 cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
 plt.show()
