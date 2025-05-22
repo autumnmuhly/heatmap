@@ -1,4 +1,5 @@
-#combine station and gridpoint for heatmap
+#!/usr/bin/env python
+
 import os
 import numpy as np
 import math
@@ -10,93 +11,21 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import datetime
 import sys
+import jsonpickle
 import heatmap
 
-#THIS IS WHERE YOU CAN DECIDED WHICH PHASES YOU ARE INTERESTED IN 
-phase='SKS'
-#DIRECTORIRES 
 
-#Mesh parameters
-number_points=1000
+infilename = "outfile.json"
+with open(infilename, "r") as inf:
+    mydata = jsonpickle.decode(inf.read())
 
-'----------------------------'
-#DO NOT CHANGE BELOW HERE
-'---------------------------'
-radius_of_earth=6378
-
-
-#List of phases- Will add more
-if phase == 'SKS':
-    dist=(0,30)
-elif phase == 'SKKS':
-    dist=(85,170)
-elif phase =='S3KS':
-    dist=(110,175)
-elif phase =='S4KS':
-    dist=(130,175)
-else:
-    print('add phase to list')
-
-#Get complete grid points and scale to Earth - come up with what is a reasonable number. why 1000? spacing should represent array size
-
-grid_array=heatmap.create_gridpoint(number_points)
-
-#Now lets load in our station data
-#need to check for NA or empty ???
-station_list=heatmap.read_stations_adept('test_stations_lat.txt')
-print('loaded in sta data')
-#construst arrays for every gridpoint
-area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
-radius_point_km=sqrt(area_per_point/pi)
-radius_point_deg=radius_point_km/111
-print(radius_of_earth)
-
-
-min_station=10
-print(f"attemp array form arrays for min {min_station} station in {radius_point_deg} deg")
-
-
-array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
-
-print(f"formed {len(array_list)} arrays for min {min_station} station in {radius_point_deg} deg")
-
-heatmap.save_arrays_json("arrays.json", array_list)
-
-
-if len(array_list) == 0:
-    print(f"no arrays pass for radius {radius_point_deg} deg with  min {min_station} stations")
-    sys.exit(1)
-
-
-#form arrays
-
-
-print(datetime.datetime.now())
-min_station=1
-array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
-print(datetime.datetime.now())
-#now we want to load in our earthquake data
-eq_list=heatmap.read_earthquakes_adept('test_earthquakes.txt')
-print('loaded in eq data')
-
-#loop over evts and arrays and check if distance range is met
-print('starting arr-evt calculation')
-for arr in array_list:
-    for evt in eq_list:
-        arr.check_eq(evt,dist)
-print('finished arr-evt calculation')
-
-
-#loop over array in array list to decided if enough stations exist to be considered an array
-min_eq_needed=1
-good_arrays=[]
-for arr in array_list:
-    print(arr.eqcount)
-    if arr.eqcount>=min_eq_needed:
-        good_arrays.append(arr)
-
-if len(good_arrays) == 0:
-    print(f"no arrays pass min eq {min_eq_needed} for radius {radius_point_deg} deg")
+# this is not the best way to do this, just trying to patch into existing script
+grid_array = mydata["grid_array"]
+good_arrays = mydata["good_arrays"]
+station_list = mydata["station_list"]
+eq_list = mydata["eq_list"]
+grid_array = mydata["grid_array"]
+radius_of_earth = mydata["radius_of_earth"]
 
 #some formatting things for our colorbar
 eq_count=[0,1]
@@ -128,7 +57,7 @@ ax.scatter(north_pole.cart.x,north_pole.cart.y,north_pole.cart.z,color='yellow',
 ax.scatter(south_pole.cart.x,south_pole.cart.y,south_pole.cart.z, color='yellow',s=100, label='North and South Pole')
 
 for pt in grid_array:
-    ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,alpha=.5,s=2)
+    ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],color="lightblue",cmap=cm.cool,norm=norm,alpha=.5,s=2)
 
 for arr in good_arrays:
     arr_scatter=ax.scatter(arr.pt.loc.cart[0],arr.pt.loc.cart[1],arr.pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,s=50)

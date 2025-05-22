@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     "numpy",
     "matplotlib",
-    "pandas",
+    "jsonpickle",
     "cartopy"
 ]
 

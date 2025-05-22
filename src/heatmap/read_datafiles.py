@@ -1,4 +1,5 @@
 
+import json
 from datetime import datetime
 
 from .gridpoint import Station, Location, EQ
@@ -53,3 +54,13 @@ def read_earthquakes_adept(filepath):
             eq = EQ(loc, time)
             eq_list.append(eq)
     return eq_list
+
+def save_arrays_json(outfilepath, array_list):
+    with open(outfilepath, "w") as outf:
+        json.dump(array_list, outf, indent=2,default=vars)
+
+def load_arrays_json(infilepath):
+    out_list = None
+    with open(outfilepath, "w") as outf:
+        out_list = json.load(outf)
+    return out_list
