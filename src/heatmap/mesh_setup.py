@@ -77,3 +77,13 @@ def find_neighbors(how_many,reference,grid):
                 neighbors.append(closest)
         neighbors = neighbors[:how_many]
     return neighbors
+
+def radius_per_gridpoint(number_points, radius_of_earth=6371):
+    """
+    evenly divide area of sphere to get radius per gridpoint, approximate
+    """
+    area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
+    radius_point_km=sqrt(area_per_point/pi)
+    deg_per_km = 360/(2*pi*radius_of_earth)
+    radius_point_deg=radius_point_km * deg_per_km
+    return radius_point_deg
