@@ -25,7 +25,7 @@ number_points=1000
 radius_of_earth=6378
 
 
-#List of phases- Will add more 
+#List of phases- Will add more
 if phase == 'SKS':
     dist=(0,40)
 elif phase == 'SKKS':
@@ -41,7 +41,7 @@ else:
 
 grid_array=heatmap.create_gridpoint(number_points)
 
-#Now lets load in our station data  
+#Now lets load in our station data
 #need to check for NA or empty ???
 station_list=heatmap.read_stations_adept('test_stationsSingle.txt')
 print('loaded in sta data')
@@ -52,8 +52,20 @@ radius_point_deg=radius_point_km/111
 #print(radius_point_deg)
 #form arrays
 
+print(datetime.datetime.now())
 min_station=3   #number of stations needed to form an array
+print(f"attemping to form arrays with min {min_station} station in {radius_point_deg} deg radius")
+
 array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
+
+print(f"formed {len(array_list)} arrays for min {min_station} station in {radius_point_deg} deg radius")
+
+#heatmap.save_arrays_json("arrays.json", array_list)
+
+
+if len(array_list) == 0:
+    print(f"no arrays pass for radius {radius_point_deg} deg with  min {min_station} stations")
+    sys.exit(1)
 
 
 #now we want to load in our earthquake data
@@ -62,31 +74,33 @@ print('loaded in eq data')
 
 # a list of eq for all arrrays
 arrayToeq=[]
+#array class that will hold array-eq pairs class in prep for testing distance
 for arr in array_list:
     arrayToeq.append(heatmap.ArrayToEqlist(arr))
-print('finished array to earthquake list')
-#a list of arrays for earthquakes 
+#evt class that will eq-ar pairs  
 eqToarray=[]
 for evt in eq_list:
     eqToarray.append(heatmap.EqtoArrayList(evt))
 print('finished earthquake to array list')
 
 #loop over all evts and arrays and check if distance range is met 
-print('starting arr-evt calculation')
 for arr in arrayToeq:
     for evt in eq_list:
         arr.check_eq(evt,dist,min_station)
-print('finished arr-evt calculation')
-for a in arrayToeq:
-    print(a.eqlists)
+print('Each array has a list of which eqs match it ')
+#for a in arrayToeq:
+    #print(a.eqlists)
 
-#loop over array in array list to decided if enough stations exist to be considered an array
+#loop over array in array list to decided if enough earthquakes exist at each array to be added in the count. if they meet the criteria they are added to good arrays
 min_eq_needed=1
 good_arrays=[]
-for arr in array_list:
+for arr in arrayToeq:
     if arr.eqcount>=min_eq_needed:
         good_arrays.append(arr)
-        
+
+if len(good_arrays) == 0:
+    print(f"no arrays pass min eq {min_eq_needed} for radius {radius_point_deg} deg")
+
 #some formatting things for our colorbar
 eq_count=[]
 for arr in arrayToeq:
@@ -97,9 +111,6 @@ if len(eq_count)<1:
     print('there are no eq within range. change eq list')
     sys.exit()
 max_value=max(eq_count)
-for arr in good_arrays:
-    print(arr.eqpair)
-
 
 print(f'this is len eq count {eq_count}')
 #refernce points
@@ -131,7 +142,7 @@ norm=plt.Normalize(0,max_value)
 #cbar = fig.colorbar(arr_scatter)
 #cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
 
-#plot on 2D map 
+#plot on 2D map
 print('starting to plot 2D')
 plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -139,9 +150,9 @@ ax = plt.axes(projection=ccrs.PlateCarree())
 ax.add_feature(cfeature.OCEAN, color='lightskyblue')
 ax.add_feature(cfeature.LAND, color="oldlace")
 gridlines=ax.gridlines(draw_labels=True, alpha=.80)
-for sta in station_list:    
+for sta in station_list:
     plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=10, color='tomato')
-    
+
 for evt in eq_list:
     plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='#06470c')
 
