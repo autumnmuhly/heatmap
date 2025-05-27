@@ -1,10 +1,10 @@
 import heatmap
 import pytest
 
-def test_spacing():
+def test_spacing(number_points):
     HOW_MANY=5
     reference=100
-    number_points=1000
+    number_points=10
     fib_grid=heatmap.create_gridpoint(number_points)
     neighbors = heatmap.find_neighbors(HOW_MANY,reference,fib_grid)
     spacing=[]
@@ -17,9 +17,9 @@ def test_spacing():
     #assert min_spacing <2.6
     #assert max_spacing<5
     #add in the average grid spacing 
-    #print(f'this is the min {min_spacing} and this is the max {max_spacing}, diff is {max_spacing-min_spacing}')
+    print(f'this is the min {min_spacing} and this is the max {max_spacing}, diff is {max_spacing-min_spacing}')
     
-def test_spacing():
+def test_spacing_2():
     #changing fib grid to be a grid that we do know 
     HOW_MANY=5
     reference=100
