@@ -17,6 +17,61 @@ def is_ok_eq_sta(evt,sta,distRange):
         #print(f'not ok time eq_sta {sta.start} {evt.time} {sta.stop}')
     return False
 
+class EqtoArrayList:
+    "a list of arrays for all the earthquakes"
+    def __init__(self,evt):
+        self.evt=evt 
+        self.array_list=[]
+    def check_array(self,arr,distRange,minSta):
+        "checks if any arrays are within range from earthquake, if so add array to the array list"
+        min=distRange[0]
+        max=distRange[1]
+        dist=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,self.EQ.loc.lat,self.EQ.loc.lon)
+        distance=abs(dist.delta)
+        if distance>min and distance<max:
+            self.truth_count=0
+            for sta in self.sta_list:
+                if is_ok_eq_sta(self,sta,distRange) == True:
+                    self.truth_count+=1
+                    if self.truth_count >= minSta:
+                        self.array_lists.append(arr)
+                        break
+
+class ArrayToEqlist:
+    "a list of eq for all arrrays"
+    def __init__(self,array):
+        self.array=array
+        self.eqlists=[]
+        self.eqcount=len(self.eqlists)
+    def check_eq(self,evt,distRange,minSta):
+        "checks if any events are within range from array, if so count 1 for that array and add event to eqlist"
+        min=distRange[0]
+        max=distRange[1]
+        dist=DistAz(self.array.pt.loc.lat,self.array.pt.loc.lon,evt.loc.lat,evt.loc.lon)
+        distance=abs(dist.delta)
+        if distance>min and distance<max:
+            self.truth_count=0
+            for sta in self.array.sta_list:
+                if is_ok_eq_sta(evt,sta,distRange) == True:
+                    self.truth_count+=1
+                    if self.truth_count >= minSta:
+                        self.eqcount +=1 #is now adding one to the grid point if all stations meet the criteria
+                        self.eqlists.append(evt)
+                        break
+
+class EqArrayPair:
+    "the earthquake distance pairs"
+    def __init__(self):
+        self.self=self
+class DepthVolume:
+    "holds the pairs that goes through our point of interest"
+    def __init__(self,pt,depthrange,radius):
+        self.pt=pt
+        self.radius=radius
+        
+        
+
+
 class Array:
     def __init__(self,pt,radius,sta_list):
         "an array has a grid point, a radius, and a list of stations in it"
@@ -24,34 +79,12 @@ class Array:
         self.radius=radius
         self.sta_list=sta_list 
         self.eqcount=0
-        self.stacde=[]
-        self.eqpair=[]
-    def check_eq(self,evt,distRange):
-        "checks if any events are within range from array, if so count 1 for that array"
-        min=distRange[0]
-        max=distRange[1]
-        dist=DistAz(self.pt.loc.lat,self.pt.loc.lon,evt.loc.lat,evt.loc.lon)
-        distance=abs(dist.delta)
-        if distance>min and distance<max:
-            self.truth_count=0
-            for sta in self.sta_list:
-                if is_ok_eq_sta(evt,sta,distRange) == True:
-                    self.truth_count+=1
-                    print(f'this is truth count {self.truth_count} and this is len of sta_list {len(self.sta_list)}')
-                    if self.truth_count == len(self.sta_list):
-                        print('they are equal')
-                        self.eqcount +=1 #needs to be changed. i think that it should be for evt in evt_list
-                        self.eqpair.append(evt)
-                #else:
-                    #print(f"not ok sta {evt} {sta}")
-        #else:
-            #print(f"not ok gp {self.pt}")
-
+        self.stacode=[]
 def form_array(sta_list,pt,radius):    
     sta_array_list=[]
     for sta in sta_list:
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
-        pt_sta=dist.delta
+        pt_sta=abs(dist.delta)
         if pt_sta<=radius:
             sta_array_list.append(sta)
             #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')

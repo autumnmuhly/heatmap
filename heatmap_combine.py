@@ -27,7 +27,7 @@ radius_of_earth=6378
 
 #List of phases- Will add more 
 if phase == 'SKS':
-    dist=(0,30)
+    dist=(0,40)
 elif phase == 'SKKS':
     dist=(85,170)
 elif phase =='S3KS':
@@ -43,77 +43,93 @@ grid_array=heatmap.create_gridpoint(number_points)
 
 #Now lets load in our station data  
 #need to check for NA or empty ???
-station_list=heatmap.read_stations_adept('test_stations_lat.txt')
+station_list=heatmap.read_stations_adept('test_stationsSingle.txt')
 print('loaded in sta data')
 #construst arrays for every gridpoint
 area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
 radius_point_km=sqrt(area_per_point/pi)
 radius_point_deg=radius_point_km/111
-print(radius_of_earth)
+#print(radius_point_deg)
 #form arrays
-print(datetime.datetime.now())
-min_station=1
+
+min_station=3   #number of stations needed to form an array
 array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
-print(datetime.datetime.now())
+
+
 #now we want to load in our earthquake data
-eq_list=heatmap.read_earthquakes_adept('test_earthquakes.txt')
+eq_list=heatmap.read_earthquakes_adept('test_singleEq.txt')
 print('loaded in eq data')
 
-#loop over evts and arrays and check if distance range is met 
-print('starting arr-evt calculation')
+# a list of eq for all arrrays
+arrayToeq=[]
 for arr in array_list:
-    for evt in eq_list:
-        arr.check_eq(evt,dist)
-print('finished arr-evt calculation')
+    arrayToeq.append(heatmap.ArrayToEqlist(arr))
+print('finished array to earthquake list')
+#a list of arrays for earthquakes 
+eqToarray=[]
+for evt in eq_list:
+    eqToarray.append(heatmap.EqtoArrayList(evt))
+print('finished earthquake to array list')
 
+#loop over all evts and arrays and check if distance range is met 
+print('starting arr-evt calculation')
+for arr in arrayToeq:
+    for evt in eq_list:
+        arr.check_eq(evt,dist,min_station)
+print('finished arr-evt calculation')
+for a in arrayToeq:
+    print(a.eqlists)
 
 #loop over array in array list to decided if enough stations exist to be considered an array
 min_eq_needed=1
 good_arrays=[]
 for arr in array_list:
-    print(arr.eqcount)
     if arr.eqcount>=min_eq_needed:
         good_arrays.append(arr)
         
 #some formatting things for our colorbar
 eq_count=[]
-for arr in good_arrays:
+for arr in arrayToeq:
     eq_count.append(arr.eqcount)
+    
 #need to put something here in case eq_count is empty
 if len(eq_count)<1:
     print('there are no eq within range. change eq list')
     sys.exit()
 max_value=max(eq_count)
+for arr in good_arrays:
+    print(arr.eqpair)
 
-print(eq_count)
+
+print(f'this is len eq count {eq_count}')
 #refernce points
 north_pole=heatmap.Location(90,0)
 south_pole=heatmap.Location(-90,0)
 
 #Plot on sphere of earth
 fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+#ax = fig.add_subplot(111, projection='3d')
 norm=plt.Normalize(0,max_value)
 
 #for sta in station_list:
     #station_scatter=ax.scatter(sta.loc.cart.x, sta.loc.cart.y, sta.loc.cart.z, color='tomato', alpha=1, s=50)
-print('starting to plot 3D')
-for evt in eq_list:
-    ax.scatter(evt.loc.cart.x,evt.loc.cart.y,evt.loc.cart.z,color='red',s=100)
+#print('starting to plot 3D')
+#for evt in eq_list:
+    #ax.scatter(evt.loc.cart.x,evt.loc.cart.y,evt.loc.cart.z,color='red',s=100)
 
-ax.scatter(north_pole.cart.x,north_pole.cart.y,north_pole.cart.z,color='yellow',s=100)
-ax.scatter(south_pole.cart.x,south_pole.cart.y,south_pole.cart.z, color='yellow',s=100, label='North and South Pole')
+#ax.scatter(north_pole.cart.x,north_pole.cart.y,north_pole.cart.z,color='yellow',s=100)
+#ax.scatter(south_pole.cart.x,south_pole.cart.y,south_pole.cart.z, color='yellow',s=100, label='North and South Pole')
 
-for pt in grid_array:
-    ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,alpha=.5,s=2)
+#for pt in grid_array:
+    #ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,alpha=.5,s=2)
 
-for arr in good_arrays:
-    arr_scatter=ax.scatter(arr.pt.loc.cart[0],arr.pt.loc.cart[1],arr.pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,s=50)
+#for arr in good_arrays:
+    #arr_scatter=ax.scatter(arr.pt.loc.cart[0],arr.pt.loc.cart[1],arr.pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,s=50)
 
 
-ax.set_box_aspect([radius_of_earth,radius_of_earth,radius_of_earth])
-cbar = fig.colorbar(arr_scatter)
-cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
+#ax.set_box_aspect([radius_of_earth,radius_of_earth,radius_of_earth])
+#cbar = fig.colorbar(arr_scatter)
+#cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
 
 #plot on 2D map 
 print('starting to plot 2D')
@@ -132,8 +148,8 @@ for evt in eq_list:
 for pt in grid_array:
     plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=2, c='blue', alpha=.5)
 
-for arr in good_arrays:
-    arr_scatter=plt.scatter(arr.pt.loc.lon,arr.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
+for arr in arrayToeq:
+    arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
  #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value   
 cbar=fig.colorbar(arr_scatter)
 cbar.set_label('Number of earthquakes in SKS range at grid point', rotation=90)
