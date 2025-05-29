@@ -33,8 +33,7 @@ Repository = "https://github.com/autumnmuhly/heatmap"
 Issues = "https://github.com/autumnmuhly/heatmap/issues"
 
 [project.scripts]
-"sounds_outside" = "heatmap.sounds_outside:main"
-"snake" = "heatmap.snake:main"
+"heatmapcalc" = "heatmap.heatmapcalc:main"
 
 [tool.pytest.ini_options]
 addopts = [
