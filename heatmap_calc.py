@@ -30,6 +30,10 @@ radius_of_earth=6378
 
 # Distance range of phase, from TauP
 dist = heatmap.phase_dist_range(phase)
+if dist is None:
+    print(f"Cannot determine phase distance range for {phase}")
+    sys.exit(0)
+print(f"phase: {phase}  dist: {dist}")
 
 #Get complete grid points and scale to Earth - come up with what is a reasonable number. why 1000? spacing should represent array size
 
