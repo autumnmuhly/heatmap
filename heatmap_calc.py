@@ -28,20 +28,12 @@ min_eq_needed=1
 '---------------------------'
 radius_of_earth=6378
 
-
-#List of phases- Will add more
-if phase == 'SKS':
-    dist=(0,30)
-elif phase == 'SKKS':
-    dist=(85,170)
-elif phase =='S3KS':
-    dist=(110,175)
-elif phase =='S4KS':
-    dist=(130,175)
-elif phase == 'ScS':
-    dist=(60,85)
-else:
-    print('add phase to list')
+# Distance range of phase, from TauP
+dist = heatmap.phase_dist_range(phase)
+if dist is None:
+    print(f"Cannot determine phase distance range for {phase}")
+    sys.exit(0)
+print(f"phase: {phase}  dist: {dist}")
 
 #Get complete grid points and scale to Earth - come up with what is a reasonable number. why 1000? spacing should represent array size
 
