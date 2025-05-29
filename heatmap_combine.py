@@ -10,6 +10,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import datetime
 import sys
+import jsonpickle
 import heatmap
 
 #THIS IS WHERE YOU CAN DECIDED WHICH PHASES YOU ARE INTERESTED IN 
@@ -53,7 +54,7 @@ radius_point_deg=radius_point_km/111
 #form arrays
 
 print(datetime.datetime.now())
-min_station=3   #number of stations needed to form an array
+min_station=1   #number of stations needed to form an array
 print(f"attemping to form arrays with min {min_station} station in {radius_point_deg} deg radius")
 
 array_list=heatmap.form_all_array(station_list,grid_array,radius_point_deg,min_station)
@@ -113,6 +114,24 @@ if len(eq_count)<1:
 max_value=max(eq_count)
 
 print(f'this is len eq count {eq_count}')
+
+
+mydata={
+    "grid_array": grid_array,
+    "good_arrays": good_arrays,
+    "phase": phase,
+    "dist": dist,
+    "min_sta_per_array": min_station,
+    "min_eq_at_array": min_eq_needed,
+    "eq_list": eq_list,
+    "station_list": station_list,
+    "radius_of_earth": radius_of_earth
+}
+
+outfilename = "outfile.json"
+with open(outfilename, "w") as outf:
+    outf.write(jsonpickle.encode(mydata))
+
 #refernce points
 north_pole=heatmap.Location(90,0)
 south_pole=heatmap.Location(-90,0)

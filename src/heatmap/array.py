@@ -26,7 +26,7 @@ class EqtoArrayList:
         "checks if any arrays are within range from earthquake, if so add array to the array list"
         min=distRange[0]
         max=distRange[1]
-        dist=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,self.EQ.loc.lat,self.EQ.loc.lon)
+        dist=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,self.evt.loc.lat,self.evt.loc.lon)
         distance=abs(dist.delta)
         if distance>min and distance<max:
             self.truth_count=0
@@ -63,6 +63,8 @@ class EqArrayPair:
     "the earthquake distance pairs"
     def __init__(self):
         self.self=self
+        
+
 class DepthVolume:
     "holds the pairs that goes through our point of interest"
     def __init__(self,pt,depthrange,radius):
@@ -70,8 +72,6 @@ class DepthVolume:
         self.radius=radius
         
         
-
-
 class Array:
     def __init__(self,pt,radius,sta_list):
         "an array has a grid point, a radius, and a list of stations in it"
@@ -98,4 +98,74 @@ def form_all_array(sta_list,grid_array,radius,minSta):
             array_list.append(array)
     return array_list
 
+class EqGridAssignment:
+    def __init__(self,gridpoint,earthquake):
+        self.gridpoint=gridpoint
+        self.eqList=earthquake
+
+def form_eq(evt_list,pt,radius):
+    "each earthquake is assigned to a gridpoint"
+    #print(pt)
+    eq_pt_list=[]
+    for evt in evt_list:
+        dist=DistAz(pt.loc.lat,pt.loc.lon,evt.loc.lat,evt.loc.lon)
+        pt_evt=abs(dist.delta)
+        if pt_evt<=radius:
+            eq_pt_list.append(evt)
+    return EqGridAssignment(pt,radius,eq_pt_list)
+
+def form_all_eq_grid(evt_list,grid_array,radius):
+    evt_pt_list=[]
+    for pt in grid_array:
+        evt_pt_list.append(form_eq(evt_list,pt,radius))
+    return evt_pt_list
 # create a class of earthquake array pairs for each earthquake
+
+def items_in_dist(locList,point,minRadius,maxRadius):
+    """""
+    locList-list of things that have location 
+    point- central location (a grid point)
+    radius - distance radius around point
+    """""
+    good_locs = []
+    for locItem in locList:
+        dist = DistAz(locItem.loc.lat,locItem.loc.lon, point.loc.lat,point.loc.lon)
+        dist=abs(dist.delta)
+        if minRadius <= dist <= maxRadius:
+            good_locs.append(locItem)
+    return good_locs
+
+class DistGrouping:
+    "Has a "
+    def __init__(self, itemList, center_point ):
+        self.itemList=itemList
+        self.centerpoint=center_point
+
+def group_items_by_dist(loc_list, point_list, minRadius, maxRadius, minSuccessful):
+    """
+    loc_list- list of things that have a location 
+    point_list- list of grid points
+    minRadius/maxRadius- min/max radius that the distance betweent the loc and point must satisfy 
+    minSuccessful-can be 0, how many of them in that range to be considered good
+    Return a touple where the 0th index is the point and the foundlist are the pairs for that point
+    """
+    good_lists = []
+    for point in point_list:
+        found_list = items_in_dist(loc_list, point, minRadius, maxRadius)
+        if (len(found_list) >= minSuccessful) & (len(found_list) != 0):
+            #good_lists.append(DistGrouping(found_list, point) )
+            good_lists.append( (point, found_list) )
+    return good_lists
+
+#where all the thins have a .time attribute
+#sta.time=[start,end]
+#evt.time=[origintime,origintime]
+#grid_point.time=None
+
+#def time_overlaps(timerangea,timerangeb):
+    #where timeable is a point in time 
+    #if timerangea or timerangeb is None:
+        #return True
+    #if timerangea.max<timerangeb.min || timerangea.min> timerangeb.max:
+     #       return False
+    #return True
