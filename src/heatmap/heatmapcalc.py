@@ -109,7 +109,7 @@ def parseArgs():
     return parser.parse_args()
 
 
-def main():
+def run_calc():
     args = parseArgs()
 
     radius_point_deg=radius_per_gridpoint(args.grid)
@@ -148,6 +148,9 @@ def main():
     with open(args.outfile, "w") as outf:
         outf.write(jsonpickle.encode(mydata))
     return 0
+
+def main():
+    return run_calc()
 
 if __name__ == '__main__':
     sys.exit(main())
