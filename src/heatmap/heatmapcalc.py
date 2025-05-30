@@ -1,6 +1,9 @@
 
 import argparse
 import jsonpickle
+from multiprocessing import Pool
+import functools
+import os
 
 from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
 from .mesh_setup import latlon_cartesian,cart_latlon, radius_per_gridpoint
@@ -15,31 +18,31 @@ from .taup import (
    phase_dist_range, taup_time, taup_phase
    )
 
-def calc_good_arrays(phase_list, array_list, eq_list, min_station=1, min_eq_needed=1):
-
-    # a list of eq for all arrrays
-    arrayToeq=[]
-    #array class that will hold array-eq pairs class in prep for testing distance
-    for arr in array_list:
-        arrayToeq.append(ArrayToEqlist(arr))
-    #evt class that will holds eq-array pairs
-    eqToarray=[]
-    for evt in eq_list:
-        eqToarray.append(EqtoArrayList(evt))
-
+def calc_one_array(phaseToDist, eq_list, min_station, min_eq_needed, arr ):
+    arrToEQ = ArrayToEqlist(arr)
     #loop over evts and arrays and check if distance range is met
+    for phase, dist in phaseToDist.items():
+        for evt in eq_list:
+            arrToEQ.check_eq(evt,dist,min_station)
+    return arrToEQ
+
+def calc_good_arrays(phase_list,
+                    array_list,
+                    eq_list,
+                    min_station=1,
+                    min_eq_needed=1):
+    phaseToDist = {}
     for phase in phase_list:
         # Distance range of phase, from TauP
         dist = phase_dist_range(phase)
         if dist is None:
             print(f"Cannot determine phase distance range for {phase}")
             sys.exit(0)
-        print(f"phase: {phase}  dist: {dist}")
-        for arr in arrayToeq:
-            for evt in eq_list:
-                    arr.check_eq(evt,dist,min_station)
+        phaseToDist[phase] = dist
+    partial_calc = functools.partial(calc_one_array, phaseToDist, eq_list, min_station, min_eq_needed)
 
-
+    with Pool(processes=(os.process_cpu_count()-1)) as pool:
+        arrayToeq = pool.map(partial_calc, array_list)
     #loop over array in array list to decided if enough eq exist to be considered an array
     good_arrays=[]
     for arr in arrayToeq:
@@ -47,10 +50,8 @@ def calc_good_arrays(phase_list, array_list, eq_list, min_station=1, min_eq_need
             good_arrays.append(arr)
 
     if len(good_arrays) == 0:
-        print(f"no arrays pass min eq {min_eq_needed} for radius {radius_point_deg} deg")
+        print(f"no arrays pass min eq {min_eq_needed}")
     return good_arrays
-
-
 
 def parseArgs():
     parser = argparse.ArgumentParser(prog='HeatmapCalc',
@@ -64,20 +65,22 @@ def parseArgs():
     parser.add_argument('--minsta', type=int, default=1, help="min number of stations near a grid point to form an array")
     parser.add_argument('--mineq', type=int, default=1, help="min number of earthquakes at an array to be successful")
     parser.add_argument('-o', '--outfile', default="heatmap.json", help="output file")
-
+    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     return parser.parse_args()
 
 
-def main():
-    args = parseArgs()
+def run_calc(args):
 
     radius_point_deg=radius_per_gridpoint(args.grid)
     if args.arrayradius < radius_point_deg:
         print(f"WARNING: array radius, {args.arrayradius} less than gridpoint spacing, {radius_point_deg}")
     grid_array=create_gridpoint(args.grid)
+    if args.verbose: print("grid created")
 
     station_list=read_stations_adept(args.stations)
+    if args.verbose: print(f"{len(station_list)} stations")
     eq_list=read_earthquakes_adept(args.earthquakes)
+    if args.verbose: print(f"{len(eq_list)} earthquakes")
 
     array_list=form_all_array(station_list, grid_array, args.arrayradius, args.minsta)
     if len(array_list) == 0:
@@ -85,7 +88,6 @@ def main():
         return 1
 
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
-
     mydata={
         "array_list":array_list,
         "grid_array": grid_array,
@@ -104,6 +106,10 @@ def main():
     with open(args.outfile, "w") as outf:
         outf.write(jsonpickle.encode(mydata))
     return 0
+
+def main():
+    args = parseArgs()
+    return run_calc(args)
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -12,7 +12,6 @@ def getTauPAsJson(cmd):
     """
     splitCmd = cmd.split(" ")
     splitCmd.append("--json")
-    print(" ".join(splitCmd))
     result = subprocess.run(splitCmd, capture_output=True)
     result.check_returncode() # will raise CalledProcessError if not ok
     return json.loads(result.stdout)
@@ -77,12 +76,21 @@ def phase_dist_range(phase, sourcedepth=0, model=None):
     if 'descriptions' in phaseDesc and len(phaseDesc['descriptions']) > 0:
         minDist = float(phaseDesc['descriptions'][0]['minexists']['dist'])
         maxDist = float(phaseDesc['descriptions'][0]['maxexists']['dist'])
-        minDist = minDist % 180
-        maxDist = maxDist % 180
-        if minDist > maxDist:
-            dist = (maxDist, minDist)
+        delta = maxDist - minDist
+        if delta >= 360:
+            dist = (0, 180)
         else:
-            dist=(minDist, maxDist)
+            maxDist = (maxDist-1) % 360 +1 # 0<maxDist<=360
+            minDist = minDist % 360        # 0<=minDist<360
+            if minDist < 180 and maxDist <= 180:
+                dist = (minDist, maxDist)
+            elif minDist < 180 and maxDist > 180:
+                dist = (min(minDist, 360-maxDist), 180)
+            elif minDist > 180 and maxDist < 180:
+                dist = (0, max(360-minDist, maxDist))
+            else:
+                dist = (min(360-minDist, 360-maxDist), max(360-minDist, 360-maxDist))
+
     return dist
 
 def main():
