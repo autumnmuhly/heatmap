@@ -1,3 +1,8 @@
+
+from multiprocessing import Pool
+import functools
+import os
+
 from .mesh_setup import latlon_cartesian,cart_latlon
 from .distaz import DistAz
 
@@ -90,13 +95,17 @@ def form_array(sta_list,pt,radius):
             #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
     return Array(pt,radius,sta_array_list)
 
+def inner_form_array(sta_list, radius, pt):
+    return form_array(sta_list,pt,radius)
+
 def form_all_array(sta_list,grid_array,radius,minSta):
     array_list=[]
-    for pt in grid_array:
-        array=form_array(sta_list,pt,radius) 
-        if len(array.sta_list)>= minSta:
-            array_list.append(array)
-    return array_list
+    partial_form_array = functools.partial(inner_form_array, sta_list, radius)
+
+    with Pool(processes=(os.process_cpu_count()-1)) as pool:
+        array_list = pool.map(partial_form_array, grid_array)
+
+    return [a for a in array_list if len(a.sta_list)>minSta]
 
 class EqGridAssignment:
     def __init__(self,gridpoint,earthquake):

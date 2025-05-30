@@ -1,6 +1,9 @@
 
 import argparse
 import jsonpickle
+from multiprocessing import Pool
+import functools
+import os
 
 from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
 from .mesh_setup import latlon_cartesian,cart_latlon, radius_per_gridpoint
@@ -14,6 +17,43 @@ from .read_datafiles import (
 from .taup import (
    phase_dist_range, taup_time, taup_phase
    )
+
+def calc_one_array(phaseToDist, eq_list, min_station, min_eq_needed, arr ):
+    arrToEQ = ArrayToEqlist(arr)
+    #loop over evts and arrays and check if distance range is met
+    for phase, dist in phaseToDist.items():
+        for evt in eq_list:
+            arrToEQ.check_eq(evt,dist,min_station)
+    return arrToEQ
+
+def calc_good_arrays_parallel(phase_list,
+                              array_list,
+                              eq_list,
+                              min_station=1,
+                              min_eq_needed=1):
+    phaseToDist = {}
+    for phase in phase_list:
+        # Distance range of phase, from TauP
+        dist = phase_dist_range(phase)
+        if dist is None:
+            print(f"Cannot determine phase distance range for {phase}")
+            sys.exit(0)
+        #print(f"phase: {phase}  dist: {dist}")
+        phaseToDist[phase] = dist
+    print("begin parrallel array check")
+    partial_calc = functools.partial(calc_one_array, phaseToDist, eq_list, min_station, min_eq_needed)
+
+    with Pool(processes=(os.process_cpu_count()-1)) as pool:
+        arrayToeq = pool.map(partial_calc, array_list)
+    #loop over array in array list to decided if enough eq exist to be considered an array
+    good_arrays=[]
+    for arr in arrayToeq:
+        if arr.eqcount>=min_eq_needed:
+            good_arrays.append(arr)
+
+    if len(good_arrays) == 0:
+        print(f"no arrays pass min eq {min_eq_needed}")
+    return good_arrays
 
 def calc_good_arrays(phase_list, array_list, eq_list, min_station=1, min_eq_needed=1):
 
@@ -36,6 +76,7 @@ def calc_good_arrays(phase_list, array_list, eq_list, min_station=1, min_eq_need
             sys.exit(0)
         print(f"phase: {phase}  dist: {dist}")
         for arr in arrayToeq:
+
             for evt in eq_list:
                     arr.check_eq(evt,dist,min_station)
 
@@ -47,7 +88,7 @@ def calc_good_arrays(phase_list, array_list, eq_list, min_station=1, min_eq_need
             good_arrays.append(arr)
 
     if len(good_arrays) == 0:
-        print(f"no arrays pass min eq {min_eq_needed} for radius {radius_point_deg} deg")
+        print(f"no arrays pass min eq {min_eq_needed}")
     return good_arrays
 
 
@@ -75,17 +116,20 @@ def main():
     if args.arrayradius < radius_point_deg:
         print(f"WARNING: array radius, {args.arrayradius} less than gridpoint spacing, {radius_point_deg}")
     grid_array=create_gridpoint(args.grid)
+    print("grid created")
 
     station_list=read_stations_adept(args.stations)
+    print(f"{len(station_list)} stations")
     eq_list=read_earthquakes_adept(args.earthquakes)
+    print(f"{len(eq_list)} earthquakes")
 
     array_list=form_all_array(station_list, grid_array, args.arrayradius, args.minsta)
     if len(array_list) == 0:
         print(f"no arrays pass for radius {args.arrayradius} deg with  min {args.minsta} stations")
         return 1
 
-    good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
-
+    #good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
+    good_arrays = calc_good_arrays_parallel(args.phases, array_list, eq_list, args.minsta, args.mineq)
     mydata={
         "array_list":array_list,
         "grid_array": grid_array,
