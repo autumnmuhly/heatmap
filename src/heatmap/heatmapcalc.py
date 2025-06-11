@@ -1,4 +1,3 @@
-
 import argparse
 import jsonpickle
 from multiprocessing import Pool
@@ -57,9 +56,9 @@ def parseArgs():
     parser = argparse.ArgumentParser(prog='HeatmapCalc',
                     description='Finds arrays for beamforming',
                     epilog='Text at the bottom of help')
-    parser.add_argument('-p', '--phases', nargs="+", help="phases of interest")
-    parser.add_argument('-s', '--stations')
-    parser.add_argument('-e', '--earthquakes')
+    parser.add_argument('-p', '--phases', nargs="+", help="phases of interest", required=True)
+    parser.add_argument('-s', '--stations',required=True)
+    parser.add_argument('-e', '--earthquakes',required=True)
     parser.add_argument('--grid', type=int, default=1000, help="number of grid points over earth")
     parser.add_argument('--arrayradius', type=float, default=5.0, help="radius of array in degrees")
     parser.add_argument('--minsta', type=int, default=1, help="min number of stations near a grid point to form an array")
