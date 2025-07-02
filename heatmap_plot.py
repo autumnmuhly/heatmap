@@ -54,8 +54,8 @@ print('starting to plot 3D')
 ax.scatter(north_pole.cart.x,north_pole.cart.y,north_pole.cart.z,color='yellow',s=100)
 ax.scatter(south_pole.cart.x,south_pole.cart.y,south_pole.cart.z, color='yellow',s=100, label='North and South Pole')
 
-for pt in mydata.grid_array:
-    ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],c=0,cmap=cm.cool,norm=norm,alpha=.5,s=2)
+#for pt in mydata.grid_array:
+    ##ax.scatter(pt.loc.cart[0],pt.loc.cart[1],pt.loc.cart[2],c=0,cmap=cm.cool,norm=norm,alpha=.5,s=2)
 
 for arr in mydata.good_arrays:
     arr_scatter=ax.scatter(arr.array.pt.loc.cart[0],arr.array.pt.loc.cart[1],arr.array.pt.loc.cart[2],c=arr.eqcount,cmap=cm.cool,norm=norm,s=50)
@@ -77,10 +77,10 @@ gridlines=ax.gridlines(draw_labels=True, alpha=.80)
     #plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=30, color='tomato')
 
 #for evt in mydata.eq_list:
-    #plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='#ffff84')
+    #plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=60,color='#ffff84')
 
-for pt in mydata.grid_array:
-    plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=2, c=0,cmap=cm.cool,norm=norm,alpha=.2)
+#for pt in mydata.grid_array:
+    #plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=15, c=0,cmap=cm.cool,norm=norm,alpha=.2)
 
 for arr in mydata.good_arrays:
     arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
