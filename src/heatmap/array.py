@@ -10,7 +10,7 @@ def is_ok_eq_sta(evt,sta,distRange):
     "Takes in an eq and checks if sta/pt is existed at time of event and if the stations are within range"
     min_dist=distRange[0]
     max_dist=distRange[1]
-    if sta.start<evt.time<sta.stop:
+    if sta.start<=evt.time<=sta.stop:
         dist=DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lon)
         gc=abs(dist.delta)
         if min_dist<gc<max_dist:
@@ -33,6 +33,7 @@ class EqtoArrayList:
         max=distRange[1]
         dist=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,self.evt.loc.lat,self.evt.loc.lon)
         distance=abs(dist.delta)
+        count=0
         if distance>min and distance<max:
             self.truth_count=0
             for sta in self.sta_list:
@@ -40,6 +41,14 @@ class EqtoArrayList:
                     self.truth_count+=1
                     if self.truth_count >= minSta:
                         self.array_lists.append(arr)
+                        if os.path.exists('grid_pts.txt'):
+                            os.remove('grid_pts.txt')
+                        count+=1
+                        print(count)
+                        file=open("grid_pts.txt",'a+')
+                        text=(f'gridpoint {count} {arr.pt.loc.lat} {arr.pt.loc.lon}\n')
+                        file.writelines(text)
+                        file.close()
                         break
 
 class ArrayToEqlist:
@@ -84,12 +93,14 @@ class Array:
         self.radius=radius
         self.sta_list=sta_list 
         self.eqcount=0
-        self.stacode=[]
-def form_array(sta_list,pt,radius):    
+        self.sta_array_list=[]
+def form_array(sta_list,pt,radius):
+    #print('forming array')    
     sta_array_list=[]
     for sta in sta_list:
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
         pt_sta=abs(dist.delta)
+        #print(f'looking at {pt.loc.lat} and {sta.loc.lat}')
         if pt_sta<=radius:
             sta_array_list.append(sta)
             #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
@@ -105,7 +116,7 @@ def form_all_array(sta_list,grid_array,radius,minSta):
     with Pool(processes=(os.process_cpu_count()-1)) as pool:
         array_list = pool.map(partial_form_array, grid_array)
 
-    return [a for a in array_list if len(a.sta_list)>minSta]
+    return [a for a in array_list if len(a.sta_list)>=minSta]
 
 class EqGridAssignment:
     def __init__(self,gridpoint,earthquake):

@@ -36,9 +36,10 @@ class Gridpoint:
         return f"gp {self.loc}"
 
 class Station:
-    def __init__(self,name,loc,start,stop):
+    def __init__(self,netwrk,name,loc,start,stop):
         "station takes a location, start time, and end time"
         self.name=name
+        self.netwrk=netwrk
         self.loc=loc
         self.start=start
         self.stop=stop

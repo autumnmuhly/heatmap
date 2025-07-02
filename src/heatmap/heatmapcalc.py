@@ -24,7 +24,8 @@ def calc_one_array(phaseToDist, eq_list, min_station, min_eq_needed, arr ):
         for evt in eq_list:
             arrToEQ.check_eq(evt,dist,min_station)
     return arrToEQ
-
+ 
+    
 def calc_good_arrays(phase_list,
                     array_list,
                     eq_list,
@@ -43,10 +44,30 @@ def calc_good_arrays(phase_list,
     with Pool(processes=(os.process_cpu_count()-1)) as pool:
         arrayToeq = pool.map(partial_calc, array_list)
     #loop over array in array list to decided if enough eq exist to be considered an array
+        
     good_arrays=[]
+    if os.path.exists('grid_pts.txt'):
+        os.remove('grid_pts.txt')
+    if os.path.exists('sta_info.txt'):
+        os.remove('sta_info.txt')
+    count_array=0
     for arr in arrayToeq:
         if arr.eqcount>=min_eq_needed:
             good_arrays.append(arr)
+            #print(arr.eqlists[0].loc)
+            count_array+=1
+            print(f'array has {arr.array.pt} and {arr.array.sta_list}')
+            lat_array=format(arr.array.pt.loc.lat,'.4f')
+            lon_array=format(arr.array.pt.loc.lon,'.4f')
+            file=open("grid_pts.txt",'a+')
+            text=(f'{count_array} {lat_array} {lon_array}\n')
+            file.writelines(text)
+            file.close()
+            for sta in arr.array.sta_list:
+                file=open("sta_info.txt",'a+')
+                text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
+                file.writelines(text)
+                file.close()
 
     if len(good_arrays) == 0:
         print(f"no arrays pass min eq {min_eq_needed}")
@@ -101,10 +122,13 @@ def run_calc(args):
         "radius_point_deg": args.arrayradius,
         "radius_of_earth": 6371
     }
+        
 
     with open(args.outfile, "w") as outf:
         outf.write(jsonpickle.encode(mydata))
     return 0
+
+
 
 def main():
     args = parseArgs()
