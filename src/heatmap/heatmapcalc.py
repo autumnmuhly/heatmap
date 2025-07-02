@@ -48,15 +48,14 @@ def calc_good_arrays(phase_list,
     good_arrays=[]
     if os.path.exists('grid_pts.txt'):
         os.remove('grid_pts.txt')
-    if os.path.exists('sta_info.txt'):
-        os.remove('sta_info.txt')
+    if os.path.exists('station_list_total'):
+        os.remove('station_list_total')
     count_array=0
     for arr in arrayToeq:
         if arr.eqcount>=min_eq_needed:
             good_arrays.append(arr)
             #print(arr.eqlists[0].loc)
             count_array+=1
-            print(f'array has {arr.array.pt} and {arr.array.sta_list}')
             lat_array=format(arr.array.pt.loc.lat,'.4f')
             lon_array=format(arr.array.pt.loc.lon,'.4f')
             file=open("grid_pts.txt",'a+')
@@ -64,7 +63,7 @@ def calc_good_arrays(phase_list,
             file.writelines(text)
             file.close()
             for sta in arr.array.sta_list:
-                file=open("sta_info.txt",'a+')
+                file=open("station_list_total",'a+')
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file.writelines(text)
                 file.close()
