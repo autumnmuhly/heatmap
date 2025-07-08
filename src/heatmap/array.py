@@ -10,7 +10,9 @@ def is_ok_eq_sta(evt,sta,distRange):
     "Takes in an eq and checks if sta/pt is existed at time of event and if the stations are within range"
     min_dist=distRange[0]
     max_dist=distRange[1]
-    if sta.start<=evt.time<=sta.stop:
+    print(sta.name, sta.stop)
+    if sta.start<=evt.time and (sta.stop=='None' or evt.time<=sta.stop):
+        #print(sta.name, sta.stop)
         dist=DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lon)
         gc=abs(dist.delta)
         if min_dist<gc<max_dist:
@@ -87,24 +89,34 @@ class DepthVolume:
         
         
 class Array:
-    def __init__(self,pt,radius,sta_list):
-        "an array has a grid point, a radius, and a list of stations in it"
+    def __init__(self,pt,radius, station_distances, basestation=None):
+        "an array has a grid point, a radius, a list of stations in it, and a base station"
         self.pt=pt
         self.radius=radius
-        self.sta_list=sta_list 
+        self.sta_list=list(station_distances) 
         self.eqcount=0
         self.sta_array_list=[]
+        self.basestation=basestation
+        self.station_distances=station_distances
 def form_array(sta_list,pt,radius):
     #print('forming array')    
     sta_array_list=[]
+    sta_distance=[]
+    sta_dist = {}
+    min_dist=361
+    basestation=None
     for sta in sta_list:
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
         pt_sta=abs(dist.delta)
-        #print(f'looking at {pt.loc.lat} and {sta.loc.lat}')
         if pt_sta<=radius:
             sta_array_list.append(sta)
+            sta_dist[sta] = pt_sta
+            if pt_sta<min_dist:
+                basestation=sta
+                min_dist=pt_sta
             #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
-    return Array(pt,radius,sta_array_list)
+    return Array(pt,radius,sta_dist, basestation)
+
 
 def inner_form_array(sta_list, radius, pt):
     return form_array(sta_list,pt,radius)

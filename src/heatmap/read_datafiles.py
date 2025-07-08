@@ -23,7 +23,9 @@ def read_stations_adept(filepath):
             elev = float(items[5])
             depth = float(items[6])
             firstdate = datetime.fromisoformat(items[7])
-            lastdate = datetime.fromisoformat(items[8])
+            lastdate=items[8]
+            if lastdate != "None":
+                lastdate = datetime.fromisoformat(items[8])
             sta = Station(net,sta,loc,firstdate,lastdate)
             sta_list.append(sta)
     return sta_list

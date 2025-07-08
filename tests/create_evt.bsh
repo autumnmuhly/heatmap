@@ -1,0 +1,16 @@
+#reads in all .sac files in a directory and saves their info into sta_info.txt
+cnt=1
+\rm -f evt_info.txt
+touch evt_info.txt
+sacfile_one=`ls *$sacroot | head -n1`
+evdep=`sachead $sacfile_one EVDP | awk '{if ($2>700) printf "%.1f", $2/1000; else printf "%.1f", $2}'`
+evla=`sachead $sacfile_one EVLA | awk '{printf "%.2f", $2}'`
+evlo=`sachead $sacfile_one EVLO | awk '{printf "%.2f", $2}'`
+evmag=`sachead $sacfile_one MAG | awk '{printf "%.1f", $2}'`
+
+year=`sachead $sacfile_one nzyear | awk '{print $2}'`
+jday=`sachead $sacfile_one nzjday | awk '{print $2}'`
+hour=`sachead $sacfile_one nzhour | awk '{printf "%02d", $2}'`
+minute=`sachead $sacfile_one nzmin | awk '{printf "%02d", $2}'`
+date=(`$py3 $pydir"jdate.py" $year $jday`)
+done

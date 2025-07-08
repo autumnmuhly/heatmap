@@ -1,0 +1,17 @@
+#reads in all .sac files in a directory and saves their info into sta_info.txt
+#network station location lat lon elevation depth firstdate lastdate
+cnt=1
+\rm -f sta_info.txt
+touch sta_info.txt
+for sacfile in *.sac ;do
+	       stanm=`sachead $sacfile kstnm | awk '{print $2}'`
+	       stala=`sachead $sacfile stla | awk '{print $2}'`
+	       stalo=`sachead $sacfile stlo | awk '{print $2}'`
+           stael=`sachead $sacfile stel | awk '{print $2}'`
+	       time_beg=`sachead $sacfile B | awk '{print $2}'`
+           time_end=`sachead $sacfile E | awk '{print $2}'`
+           start=`sachead $sacfile starttime | awk '{print $2}'`
+           network=`sachead $sacfile KNETWK | awk '{print $2}'`
+	       printf "%4s %9.4f %s\n %7.2f %7.2f %s\n" $stanm $stala $stalo $sacfile >> sta_info.txt
+	       echo sacfile $sacfile stala $stala stalo $stalo
+done

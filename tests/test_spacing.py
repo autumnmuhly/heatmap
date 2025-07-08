@@ -48,3 +48,4 @@ def test_spacing():
     #assert max_spacing<5
     #add in the average grid spacing
     print(f'this is the min {min_spacing} and this is the max {max_spacing}, diff is {max_spacing-min_spacing}')
+

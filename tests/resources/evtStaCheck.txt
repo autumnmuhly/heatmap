@@ -1,0 +1,2 @@
+eventid datetime name mag magtype lat lon depth np1_strike np1_dip np1_rake
+usp0006qtr 2025-01-03T16:11:57 199501031611 5.9 mw 79 -160 13.9 None None None

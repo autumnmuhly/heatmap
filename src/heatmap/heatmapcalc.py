@@ -50,23 +50,32 @@ def calc_good_arrays(phase_list,
         os.remove('grid_pts.txt')
     if os.path.exists('station_list_total'):
         os.remove('station_list_total')
+    if os.path.exists('base_stations'):
+        os.remove('base_stations')
     count_array=0
     for arr in arrayToeq:
         if arr.eqcount>=min_eq_needed:
             good_arrays.append(arr)
-            #print(arr.eqlists[0].loc)
             count_array+=1
+            #create base station list
+            file=open("base_stations",'a+')
+            text={f'{arr.array.basestation.netwrk} {arr.array.basestation.name} {format(arr.array.basestation.loc.lat,'.4f')} {format(arr.array.basestation.loc.lon,'.4f')}\n'}
+            file.writelines(text)
+            file.close()
+            #create grid point list
             lat_array=format(arr.array.pt.loc.lat,'.4f')
             lon_array=format(arr.array.pt.loc.lon,'.4f')
             file=open("grid_pts.txt",'a+')
             text=(f'{count_array} {lat_array} {lon_array}\n')
             file.writelines(text)
             file.close()
+            #create list of stations to be used
             for sta in arr.array.sta_list:
                 file=open("station_list_total",'a+')
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file.writelines(text)
                 file.close()
+            
 
     if len(good_arrays) == 0:
         print(f"no arrays pass min eq {min_eq_needed}")
@@ -91,6 +100,7 @@ def parseArgs():
 def run_calc(args):
 
     radius_point_deg=radius_per_gridpoint(args.grid)
+    print(f'array radius, {args.arrayradius} and gridpoint spacing, {radius_point_deg}')
     if args.arrayradius < radius_point_deg:
         print(f"WARNING: array radius, {args.arrayradius} less than gridpoint spacing, {radius_point_deg}")
     grid_array=create_gridpoint(args.grid)
