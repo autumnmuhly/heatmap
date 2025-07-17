@@ -13,6 +13,9 @@ from .taup import (
    phase_dist_range, taup_time, taup_phase
    )
 
+from .heatmapsummary import summary
+from .heatmap_plot import plot
+
 __all__=[
     "find_neighbors",
     "cart_latlon",
@@ -39,5 +42,7 @@ __all__=[
     "group_items_by_dist",
     "phase_dist_range",
     "taup_time",
-    "taup_phase"
+    "taup_phase",
+    "summary",
+    "plot"
 ]

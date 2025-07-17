@@ -8,7 +8,7 @@ dynamic = ["version"]
 authors = [
   { name="Autumn Muhly", email="amuhly@email.sc.edu" },
 ]
-description = "Speak like snakes and bees."
+description = ""
 readme = "README.md"
 requires-python = ">=3.13"
 classifiers = [
@@ -35,6 +35,7 @@ Issues = "https://github.com/autumnmuhly/heatmap/issues"
 [project.scripts]
 "heatmapcalc" = "heatmap.heatmapcalc:main"
 "heatmapsummary" = "heatmap.heatmapsummary:main"
+"heatmapplot" = "heatmap.heatmap_plot:main"
 
 [tool.pytest.ini_options]
 addopts = [
