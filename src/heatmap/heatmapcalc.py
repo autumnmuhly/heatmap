@@ -7,7 +7,7 @@ import os
 from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
 from .mesh_setup import latlon_cartesian,cart_latlon, radius_per_gridpoint
 from .gridpoint import Gridpoint,Station,EQ,Location
-from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist
+from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist,is_array_gp_okay
 from .distaz import DistAz
 from .read_datafiles import (
     read_stations_adept, read_earthquakes_adept,
@@ -53,6 +53,7 @@ def calc_good_arrays(phase_list,
     if os.path.exists('base_stations'):
         os.remove('base_stations')
     count_array=0
+    sta_list_total=[]
     for arr in arrayToeq:
         if arr.eqcount>=min_eq_needed:
             good_arrays.append(arr)
@@ -72,6 +73,7 @@ def calc_good_arrays(phase_list,
             #create list of stations to be used
             for sta in arr.array.sta_list:
                 file=open("station_list_total",'a+')
+                sta_list_total.append(sta)
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file.writelines(text)
                 file.close()
@@ -126,7 +128,13 @@ def run_calc(args):
     if len(array_list) == 0:
         print(f"no arrays pass for radius {args.arrayradius} deg with  min {args.minsta} stations")
         return 1
-
+    print(f' this is the len of array_list {len(array_list)}')
+    array_list_checked=[]
+    for arr in array_list:
+        if is_array_gp_okay(arr,args.arrayradius) == True:
+            array_list_checked.append(arr)
+    array_list=array_list_checked
+    print(f'this is the len of array list now {len(array_list)}')
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
     mydata={
         "array_list":array_list,

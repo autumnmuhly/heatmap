@@ -56,5 +56,3 @@ class EQ:
 
 
 
-
-#Could also create a catalog of earthquakes by idk year for example and counts the arrays 
