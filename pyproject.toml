@@ -34,6 +34,7 @@ Issues = "https://github.com/autumnmuhly/heatmap/issues"
 
 [project.scripts]
 "heatmapcalc" = "heatmap.heatmapcalc:main"
+"heatmapsummary" = "heatmap.heatmapsummary:main"
 
 [tool.pytest.ini_options]
 addopts = [

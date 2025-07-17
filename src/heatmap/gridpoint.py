@@ -44,7 +44,7 @@ class Station:
         self.start=start
         self.stop=stop
     def __str__(self):
-        return f"{self.name} {self.loc}"
+        return f"{self.netwrk}_{self.name} {self.loc}"
 
 class EQ:
     def __init__(self,loc,event_time):

@@ -89,6 +89,7 @@ def parseArgs():
     parser.add_argument('-s', '--stations',required=True)
     parser.add_argument('-e', '--earthquakes',required=True)
     parser.add_argument('--grid', type=int, default=1000, help="number of grid points over earth")
+    parser.add_argument('--region', type=int, nargs=4, help="restrict grid points to WESN box")
     parser.add_argument('--arrayradius', type=float, default=5.0, help="radius of array in degrees")
     parser.add_argument('--minsta', type=int, default=1, help="min number of stations near a grid point to form an array")
     parser.add_argument('--mineq', type=int, default=1, help="min number of earthquakes at an array to be successful")
@@ -105,6 +106,16 @@ def run_calc(args):
         print(f"WARNING: array radius, {args.arrayradius} less than gridpoint spacing, {radius_point_deg}")
     grid_array=create_gridpoint(args.grid)
     if args.verbose: print("grid created")
+    if args.region:
+        region_grid = []
+        west = args.region[0]
+        east = args.region[1]
+        south = args.region[2]
+        north = args.region[3]
+        for g in grid_array:
+            if west <= g.loc.lon <= east and south <= g.loc.lat <= north:
+                region_grid.append(g)
+        grid_array = region_grid
 
     station_list=read_stations_adept(args.stations)
     if args.verbose: print(f"{len(station_list)} stations")
