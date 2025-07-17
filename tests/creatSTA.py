@@ -18,8 +18,8 @@ for network_list in inventory:
         stael=station.elevation
         stadp=0.0
         location=0.0
-        start=station.start_date.strftime("%Y-%m-%dT%H:%M:%S")
-        end=station.end_date.strftime("%Y-%m-%dT%H:%M:%S")
+        start=UTCDateTime(station.start_date).strftime("%Y-%m-%dT%H:%M:%S")
+        end=UTCDateTime(station.end_date).strftime("%Y-%m-%dT%H:%M:%S")
         file=open("sta_info.txt",'a+')
         text=(f'{network} {sta} {location} {stala} {stalo} {stael} {stadp} {start} {end}\n')
         file.writelines(text)

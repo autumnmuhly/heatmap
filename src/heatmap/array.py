@@ -10,8 +10,9 @@ def is_ok_eq_sta(evt,sta,distRange):
     "Takes in an eq and checks if sta/pt is existed at time of event and if the stations are within range"
     min_dist=distRange[0]
     max_dist=distRange[1]
-    print(sta.name, sta.stop)
+    #print(sta.name, sta.start,evt.time, sta.stop)
     if sta.start<=evt.time and (sta.stop=='None' or evt.time<=sta.stop):
+        #print('weve add the above to list')
         #print(sta.name, sta.stop)
         dist=DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lon)
         gc=abs(dist.delta)
@@ -23,6 +24,24 @@ def is_ok_eq_sta(evt,sta,distRange):
     #else:
         #print(f'not ok time eq_sta {sta.start} {evt.time} {sta.stop}')
     return False
+
+def is_array_gp_okay(arr,spacing):
+    x=0
+    y=0
+    z=0
+    for sta in arr.sta_list:
+        cart=latlon_cartesian(sta.loc.lat,sta.loc.lon)
+        #print(cart.x,cart.y,cart.z)
+        x+=cart.x
+        y+=cart.y
+        z+=cart.z
+    num=len(arr.sta_list)
+    cm_latlon=cart_latlon(x/num,y/num,z/num)
+    diff=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,cm_latlon[0],cm_latlon[1])
+    if diff.delta>=(spacing/2):
+        return False
+    return True
+
 
 class EqtoArrayList:
     "a list of arrays for all the earthquakes"
@@ -46,7 +65,6 @@ class EqtoArrayList:
                         if os.path.exists('grid_pts.txt'):
                             os.remove('grid_pts.txt')
                         count+=1
-                        print(count)
                         file=open("grid_pts.txt",'a+')
                         text=(f'gridpoint {count} {arr.pt.loc.lat} {arr.pt.loc.lon}\n')
                         file.writelines(text)
@@ -99,7 +117,6 @@ class Array:
         self.basestation=basestation
         self.station_distances=station_distances
 def form_array(sta_list,pt,radius):
-    #print('forming array')    
     sta_array_list=[]
     sta_distance=[]
     sta_dist = {}

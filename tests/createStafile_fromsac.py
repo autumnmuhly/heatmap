@@ -17,7 +17,6 @@ for sacfile in st:
     stael=0
     stadp=0
     netwrk=sacfile.stats.sac.knetwk
-    print(netwrk,stanm)
     inventory=client.get_stations(network=netwrk,station=stanm,level='station')
     station=inventory[0][0]
     start=UTCDateTime(station.start_date).strftime("%Y-%m-%dT%H:%M:%S")
@@ -29,3 +28,4 @@ for sacfile in st:
     text=(f'{netwrk[:2]} {stanm} {location} {stala} {stalo} {stael} {stadp} {start} {end}\n')
     file.writelines(text)
     file.close()
+print('Run create_evt.py if you dont have event list. If you have event list you are ready to heatmap')

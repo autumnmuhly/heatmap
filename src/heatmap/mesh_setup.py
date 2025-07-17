@@ -49,7 +49,11 @@ def latlon_cartesian(lat,lon):
     z = R*np.sin(lat)
     return Cartesian(x,y,z)
 
-
+class Neighbors:
+    def __init__(self,pt,distances,list_neighbors):
+        self.pt=pt #refernce point
+        self.list_neighbors=list_neighbors #list of grid points that its neighbors
+        self.distances=distances #list of distances to the neighbors
 
 #This function will find the nearest neighbors for any 3D grid 
 def find_neighbors(how_many,reference,grid):
@@ -57,17 +61,12 @@ def find_neighbors(how_many,reference,grid):
     neighbors = []
     fib_grid=grid
     #print(neighbors)
-    for i in range(len(fib_grid.x_cart)):
-        #not great circle distance
-        #distance=dist3d(fib_grid.x_cart[reference],fib_grid.y_cart[reference],fib_grid.z_cart[reference],fib_grid.x_cart[i],fib_grid.y_cart[i],fib_grid.z_cart[i])
-        #this is great circle distance - doesnt matter at this small of values 
-        distance=DistAz(fib_grid.lat[reference],fib_grid.lon[reference],fib_grid.lat[i],fib_grid.lon[i])
+    for pt in fib_grid: 
+        distance=DistAz(reference.loc.lat,reference.loc.lon,pt.loc.lat,pt.loc.lon)
         distance=distance.delta
-        #print(f' this is the distance {distance}')
         if distance != 0:
-            #print('possible')
             found = False
-            closest=(distance,i)
+            closest=(distance,pt)
             for j in range(min(how_many, len(neighbors))):
                 if distance<neighbors[j][0]:
                     neighbors.insert(j,closest)
@@ -84,6 +83,7 @@ def radius_per_gridpoint(number_points, radius_of_earth=6371):
     """
     area_per_point=(4*pi*radius_of_earth*radius_of_earth)/number_points
     radius_point_km=sqrt(area_per_point/pi)
+    print(f' this should be the amount in km{radius_point_km}')
     deg_per_km = 360/(2*pi*radius_of_earth)
     radius_point_deg=radius_point_km * deg_per_km
     return radius_point_deg

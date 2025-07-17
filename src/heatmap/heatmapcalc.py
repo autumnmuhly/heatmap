@@ -134,6 +134,7 @@ def run_calc(args):
         if is_array_gp_okay(arr,args.arrayradius) == True:
             array_list_checked.append(arr)
     array_list=array_list_checked
+
     print(f'this is the len of array list now {len(array_list)}')
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
     mydata={

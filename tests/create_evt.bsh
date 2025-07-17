@@ -1,6 +1,6 @@
 #reads in all .sac files in a directory and saves their info into sta_info.txt
 cnt=1
-\rm -f evt_info.txt
+#\rm -f evt_info.txt
 touch evt_info.txt
 sacfile_one=`ls *$sacroot | head -n1`
 evdep=`sachead $sacfile_one EVDP | awk '{if ($2>700) printf "%.1f", $2/1000; else printf "%.1f", $2}'`
