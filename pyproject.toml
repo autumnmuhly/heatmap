@@ -36,6 +36,7 @@ Issues = "https://github.com/autumnmuhly/heatmap/issues"
 "heatmapcalc" = "heatmap.heatmapcalc:main"
 "heatmapsummary" = "heatmap.heatmapsummary:main"
 "heatmapplot" = "heatmap.heatmap_plot:main"
+"prepvespa" = "heatmap.vespa_prepare:main"
 
 [tool.pytest.ini_options]
 addopts = [
