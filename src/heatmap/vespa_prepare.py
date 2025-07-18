@@ -10,13 +10,13 @@ def prepare_vespa():
     with open(infilename, "r") as inf:
         mydata = jsonpickle.decode(inf.read())
     mydata = SimpleNamespace(mydata)
-    if os.path.exists('grid_pts.txt'):
-        os.remove('grid_pts.txt')
+    if os.path.exists('grid_pts'):
+        os.remove('grid_pts')
     if os.path.exists('station_list_total'):
         os.remove('station_list_total')
     if os.path.exists('base_stations'):
         os.remove('base_stations')
-    with open("base_stations_test",'w') as file1, open("grid_pts_test.txt",'w') as file2, open('station_list_total','w') as file3:
+    with open("base_stations",'w') as file1, open("grid_pts",'w') as file2, open('station_list_total','w') as file3:
         count_array=0
         sta_list_total=[]
         for arr in mydata.good_arrays:
