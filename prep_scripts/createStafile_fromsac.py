@@ -1,6 +1,4 @@
-#autumn muhly June 13,2025
-#obspy version to get station information for a list of .sac files. Requires you to be in directory with the .sac files. return sra_info.txt file in the proper format for TALOOPER
-#network station location lat lon elevation depth firstdate lastdate
+#create sta file for heatmap if sac files already exist. must run script in directory of sac files. output is sta_info.txt
 import obspy
 from obspy.clients.fdsn import Client
 import os

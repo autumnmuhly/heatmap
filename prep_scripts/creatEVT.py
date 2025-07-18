@@ -1,5 +1,4 @@
-#Create a station list using obspy FDSN for stations that existed during the frame of reference, and certain magnitude
-#eventid datetime name mag magtype lat lon depth np1_strike np1_dip np1_rake
+Creates an eq catalog given in the format needed for heatmap. output is file evt_info.txt
 import obspy
 from obspy.clients.fdsn import Client
 from obspy.core.utcdatetime import UTCDateTime

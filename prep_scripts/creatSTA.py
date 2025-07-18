@@ -1,4 +1,4 @@
-#Create a station list using obspy FDSN for stations that existed during the frame of reference, and certain magnitude
+#create sta list for heatmap. out put is sta_info.txt
 import obspy
 from obspy.clients.fdsn import Client
 from obspy.core.utcdatetime import UTCDateTime
