@@ -10,7 +10,7 @@ to run:
 
 heatmapcalc -s stationfilename -e eqcatalogfilename --minsta 1 --mineq 1 --phase S  
 
-required inputs:
+required inputs:  
 '-p', '--phases', phase(s) of interest  
 '-s', '--stations', stationfile name  
 '-e', '--earthquakes' earthquake catalog name  
