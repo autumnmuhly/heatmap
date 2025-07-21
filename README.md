@@ -29,3 +29,6 @@ heatmapplot
 to prepare files for array processing:  
 prepvespa  
 - returns a list of grid points, stations, basestations, and eq catalog  
+
+station file:
+if you need to create a station file
