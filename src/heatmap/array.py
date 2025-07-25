@@ -126,6 +126,7 @@ def form_array(sta_list,pt,radius):
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
         pt_sta=abs(dist.delta)
         if pt_sta<=radius:
+            #print(sta.name, pt.loc)
             sta_array_list.append(sta)
             sta_dist[sta] = pt_sta
             if pt_sta<min_dist:

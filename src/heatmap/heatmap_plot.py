@@ -92,6 +92,7 @@ def plot():
     #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value
     cbar=fig.colorbar(arr_scatter)
     cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
+    #ax.set_extent([-93.5, -87.4, 29, 34], crs=ccrs.PlateCarree())
     return plt.show()
 
 

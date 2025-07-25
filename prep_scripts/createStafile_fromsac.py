@@ -8,13 +8,20 @@ if os.path.exists('sta_info.txt'):
     os.remove('sta_info.txt')
 st = obspy.read('*.sac', debug_headers=True)
 client=Client('IRIS')
+file=open("sta_info.txt",'a+')
+text=('network staname loc lat lon elv dp start end\n')
+file.writelines(text)
+file.close()
 for sacfile in st:
+    print(sacfile)
     stanm=sacfile.stats.sac.kstnm.strip()+''
     stala=format(sacfile.stats.sac.stla,'.4f')
     stalo=format(sacfile.stats.sac.stlo,'.4f')
-    stael=0
-    stadp=0
+    stael=sacfile.stats.sac.stel
+    stadp=sacfile.stats.sac.stdp
     netwrk=sacfile.stats.sac.knetwk
+    time_beg=sacfile.stats.sac.b
+    time_end=sacfile.stats.sac.e
     inventory=client.get_stations(network=netwrk,station=stanm,level='station')
     station=inventory[0][0]
     start=UTCDateTime(station.start_date).strftime("%Y-%m-%dT%H:%M:%S")
