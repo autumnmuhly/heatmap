@@ -41,18 +41,18 @@ def read_earthquakes_adept(filepath):
         headerline = infile.readline() # ignore this one
         for line in infile:
             items = line.split()
-            eventid = items[0]
+            eventid = items[10]
             time = datetime.fromisoformat(items[1])
-            name = items[2]
-            mag = float(items[3])
-            magtype = items[4]
-            lat = float(items[5])
-            lon = float(items[6])
+            name = items[0]
+            mag = float(items[2])
+            magtype = items[3]
+            lat = float(items[4])
+            lon = float(items[5])
             loc = Location(lat, lon)
-            depth = float(items[7])
-            strike = float(items[8]) if items[8] != "None" else None
-            dip = float(items[9]) if items[9] != "None" else None
-            rake = float(items[10]) if items[10] != "None" else None
+            depth = float(items[6])
+            strike = float(items[7]) if items[8] != "None" else None
+            dip = float(items[8]) if items[9] != "None" else None
+            #rake = float(items[9]) if items[10] != "None" else None
             eq = EQ(loc, time)
             eq_list.append(eq)
     return eq_list

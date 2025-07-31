@@ -99,15 +99,23 @@ def run_calc(args):
     if len(array_list) == 0:
         print(f"no arrays pass for radius {args.arrayradius} deg with  min {args.minsta} stations")
         return 1
-    print(f' this is the len of array_list {len(array_list)}')
     array_list_checked=[]
     for arr in array_list:
         if is_array_gp_okay(arr,args.arrayradius) == True:
             array_list_checked.append(arr)
     array_list=array_list_checked
 
-    print(f'this is the len of array list now {len(array_list)}')
+
+    print(f'this is the len of array list {len(array_list)}')
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
+    with open('eq_list','w') as file1:
+        for arr in good_arrays:
+            for evt in arr.eqlists:
+                text=(f'{evt.time}\n')
+                file1.writelines(text)
+    print(f'this is the len of how many arrays are good {len(good_arrays)}')
+    os.system("awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' eq_list | awk  '{print $0}' > temp_sta")
+    os.system("mv -f temp_sta eq_list")
     mydata={
         "array_list":array_list,
         "grid_array": grid_array,
@@ -120,10 +128,11 @@ def run_calc(args):
         "eq_list": eq_list,
         "station_list": station_list,
         "radius_point_deg": args.arrayradius,
-        "radius_of_earth": 6371
+        "radius_of_earth": 6371,
+        "num_pts": args.grid
     }
         
-
+        
     with open(args.outfile, "w") as outf:
         outf.write(jsonpickle.encode(mydata))
     return 0

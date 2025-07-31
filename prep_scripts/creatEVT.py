@@ -1,4 +1,4 @@
-Creates an eq catalog given in the format needed for heatmap. output is file evt_info.txt
+#Creates an eq catalog given in the format needed for heatmap. output is file evt_info.txt
 import obspy
 from obspy.clients.fdsn import Client
 from obspy.core.utcdatetime import UTCDateTime
@@ -7,8 +7,8 @@ from obspy import read_events
 if os.path.exists('evt_info.txt'):
     os.remove('evt_info.txt')
 client = Client("IRIS")
-starttime = UTCDateTime("2014-04-01")
-endtime = UTCDateTime("2015-07-01")
+starttime = UTCDateTime("2011-11-15")
+endtime = UTCDateTime("2011-11-15")
 min_mag=5.5
 min_depth=50
 catalog=client.get_events(starttime=starttime, endtime=endtime,minmagnitude=min_mag,mindepth=min_depth)

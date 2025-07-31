@@ -13,7 +13,6 @@ text=('network staname loc lat lon elv dp start end\n')
 file.writelines(text)
 file.close()
 for sacfile in st:
-    print(sacfile)
     stanm=sacfile.stats.sac.kstnm.strip()+''
     stala=format(sacfile.stats.sac.stla,'.4f')
     stalo=format(sacfile.stats.sac.stlo,'.4f')
