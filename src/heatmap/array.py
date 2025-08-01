@@ -10,14 +10,10 @@ def is_ok_eq_sta(evt,sta,distRange):
     "Takes in an eq and checks if sta/pt is existed at time of event and if the stations are within range"
     min_dist=distRange[0]
     max_dist=distRange[1]
-    #print(sta.name, sta.start,evt.time, sta.stop)
     if sta.start<=evt.time and (sta.stop=='None' or evt.time<=sta.stop):
-        #print('weve add the above to list')
-        #print(sta.name, sta.stop)
         dist=DistAz(evt.loc.lat,evt.loc.lon,sta.loc.lat,sta.loc.lon)
         gc=abs(dist.delta)
         if min_dist<gc<max_dist:
-            #print(f'this eq and sta are okay {evt},{sta}')
             return True
         #else:
             #print("not ok distance eq_sta")
@@ -77,6 +73,7 @@ class ArrayToEqlist:
         self.array=array
         self.eqlists=[]
         self.eqcount=len(self.eqlists)
+        self.sta_newlist=[]
     def check_eq(self,evt,distRange,minSta):
         "checks if any events are within range from array, if so count 1 for that array and add event to eqlist"
         min=distRange[0]
@@ -86,18 +83,25 @@ class ArrayToEqlist:
         if distance>min and distance<max:
             self.truth_count=0
             for sta in self.array.sta_list:
+                #print(f'we are looking at {sta.name}')
                 if is_ok_eq_sta(evt,sta,distRange) == True:
+                    #print(f'this {sta.name} made it ')
+                    #print('checking if sta in array and evt are in right distance and start time')
+                    self.sta_newlist.append(sta)
                     self.truth_count+=1
                     if self.truth_count >= minSta:
                         self.eqcount +=1 #is now adding one to the grid point if all stations meet the criteria
                         self.eqlists.append(evt)
                         break
+        return True
 
 class EqArrayPair:
-    "the earthquake distance pairs"
-    def __init__(self):
+    "throws away stations that are not okay for that eq"
+    def __init__(self,evt,array):
         self.self=self
-        
+        self.evt=evt
+        self.array=array
+        #if
 
 class DepthVolume:
     "holds the pairs that goes through our point of interest"
@@ -126,13 +130,11 @@ def form_array(sta_list,pt,radius):
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
         pt_sta=abs(dist.delta)
         if pt_sta<=radius:
-            #print(sta.name, pt.loc)
             sta_array_list.append(sta)
             sta_dist[sta] = pt_sta
             if pt_sta<min_dist:
                 basestation=sta
                 min_dist=pt_sta
-            #print(f'adding this station {sta.name} to gpt located {pt.loc.lat}')
     return Array(pt,radius,sta_dist, basestation)
 
 
@@ -155,7 +157,6 @@ class EqGridAssignment:
 
 def form_eq(evt_list,pt,radius):
     "each earthquake is assigned to a gridpoint"
-    #print(pt)
     eq_pt_list=[]
     for evt in evt_list:
         dist=DistAz(pt.loc.lat,pt.loc.lon,evt.loc.lat,evt.loc.lon)

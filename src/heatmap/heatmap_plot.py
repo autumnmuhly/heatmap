@@ -73,9 +73,9 @@ def plot():
     gridlines=ax.gridlines(draw_labels=True, alpha=.80)
     plt.title(f'pts:{mydata.num_pts} rad:{mydata.arrayradius} phase:{mydata.phase}')
     for sta in mydata.station_list:
-        plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=10, color='yellow')
+        plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=20, color='yellow')
     for arr in mydata.good_arrays:
-        for sta in arr.array.sta_list:
+        for sta in arr.sta_newlist:
             plt.scatter(sta.loc.lon, sta.loc.lat, marker='v', s=10, color='tomato')
     for arr in mydata.good_arrays:
         #print(arr.eqlists)

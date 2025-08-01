@@ -15,6 +15,8 @@ os.system("mv -f temp_sta station_list_total")
 for arr in mydata.good_arrays:
     for evt in arr.eqlists:
         evt_name=UTCDateTime(evt.time).strftime("%Y%m%d%H%M")
+        #delete sta that dont have data
+        #check to make sure station count is still good
         print(evt_name)
 
 sta_list = []

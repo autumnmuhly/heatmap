@@ -30,7 +30,7 @@ def prepare_vespa():
             gp_text=(f'{count_array} {lat_array} {lon_array}\n')
             file2.writelines(gp_text)
             #create station list
-            for sta in arr.array.sta_list:
+            for sta in arr.sta_newlist:
                 sta_list_total.append(sta)
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file3.writelines(text)

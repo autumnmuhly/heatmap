@@ -108,11 +108,18 @@ def run_calc(args):
 
     print(f'this is the len of array list {len(array_list)}')
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
+    
     with open('eq_list','w') as file1:
         for arr in good_arrays:
             for evt in arr.eqlists:
+                #eq sub array here we create eq to array pair. and throw away stations that dont work for that eq. like time interval doesnt overlap
                 text=(f'{evt.time}\n')
                 file1.writelines(text)
+    
+    #for arr in good_arrays:
+        #print(arr.ArrayToEqlist)
+        #for sta in arr.array.sta_list:
+            #print(sta.name)
     print(f'this is the len of how many arrays are good {len(good_arrays)}')
     os.system("awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' eq_list | awk  '{print $0}' > temp_sta")
     os.system("mv -f temp_sta eq_list")
