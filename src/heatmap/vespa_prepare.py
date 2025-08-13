@@ -34,6 +34,10 @@ def prepare_vespa():
                 sta_list_total.append(sta)
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file3.writelines(text)
+    command=f"awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' station_list_total > temp_sta"
+    os.system(command)
+    rm_command=f"mv -f temp_sta station_list_total"
+    os.system(rm_command)
     return 
 
 def main():
