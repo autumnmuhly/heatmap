@@ -26,10 +26,9 @@ def plot():
 
     #some formatting things for our colorbar
     eq_count=[]
-    print(eq_count)
     for arr in mydata.good_arrays:
         eq_count.append(arr.eqcount)
-    #need to put something here in case eq_count is empty
+    print(eq_count)
     if len(eq_count)<1:
         print('there are no eq within range. change eq list')
         sys.exit()
@@ -72,29 +71,32 @@ def plot():
     ax.add_feature(cfeature.LAND, color="oldlace")
     gridlines=ax.gridlines(draw_labels=True, alpha=.80)
     plt.title(f'pts:{mydata.num_pts} rad:{mydata.arrayradius} phase:{mydata.phase}')
-    for sta in mydata.station_list:
-        plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=20, color='yellow')
+    #for sta in mydata.station_list:
+        #plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=20, color='green')
     for arr in mydata.good_arrays:
         for sta in arr.sta_newlist:
-            plt.scatter(sta.loc.lon, sta.loc.lat, marker='v', s=10, color='tomato')
+            plt.scatter(sta.loc.lon, sta.loc.lat, marker='v', s=20, color='tomato')
+    #for evt in mydata.eq_list:
+        #plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='yellow')
     for arr in mydata.good_arrays:
-        #print(arr.eqlists)
+        #plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o',s=10,color='purple')
         for evt in arr.eqlists:
+            #print(evt.time)
             plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='#01153e')
-
+    
     #for pt in mydata.grid_array:
         #plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=15, c=0,cmap=cm.cool,norm=norm,alpha=.2)
 
-    for arr in mydata.good_arrays:
-        arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
+    #for arr in mydata.good_arrays:
+        #arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
         #circle=matplotlib.patches.Circle((arr.array.pt.loc.lon,arr.array.pt.loc.lat),radius=mydata.arrayradius,alpha=.2)
         #ax.add_patch(circle)
         #plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20,c='red',transform=ccrs.PlateCarree())
     #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value
-    cbar=fig.colorbar(arr_scatter)
-    cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
+    #cbar=fig.colorbar(arr_scatter)
+    # cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
     #ax.set_extent([-93.5, -87.4, 29, 34], crs=ccrs.PlateCarree())
-    
+    plt.savefig('minieq.png', dpi=700, bbox_inches='tight', pad_inches=0.1)
     return plt.show()
 
 
