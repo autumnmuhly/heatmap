@@ -12,8 +12,6 @@ class SacStream:
         "Sac files have a sta name, min and max amp"
         self.stanm = stanm
         self.network=network
-        self.depmin = [] #for later if we need it ?
-        self.depmax = [] #for later if we need it ?
 
 def readStaFile(stafile):
     sta_list = []
@@ -41,22 +39,25 @@ def check_sacfiles(stafile):
     #get min and max amplitudes for sac files
     for sta in sta_list:
             #change directories
+            wd=os.getcwd()
             os.chdir(f"sac")
-            stream=obspy.read(f'*.{sta.stanm}.{sta.network}*R.D.sac',debug_headers=True) #ending of .sac file is adept specific
-            min=stream[0].stats.sac.depmin
-            max=stream[0].stats.sac.depmax
-            if min == 0 or min == "nan" or max == 0 or max == "nan":
-                print(f'needs to be deleted {sta.stanm}')
-                station=sta.stanm
-                network=sta.network
-                os.chdir(f"../")
-                command=f"awk -v network='{network}' -v station='{station}' '$1 != station && $2 != network' {stafile} > output.txt"
-                os.system(command)
-                move_cmmd=f"mv -f output.txt {stafile}"
-                os.system(move_cmmd)
+            filepath=f'*.{sta.stanm}.{sta.network}*R.D.sac'
+            if os.path.exists(filepath):
+                stream=obspy.read(f'*.{sta.stanm}.{sta.network}*R.D.sac',debug_headers=True) #ending of .sac file is adept specific
+                min=stream[0].stats.sac.depmin
+                max=stream[0].stats.sac.depmax
+                if min == 0 or min == "nan" or max == 0 or max == "nan":
+                    print(f'needs to be deleted {sta.stanm}')
+                    station=sta.stanm
+                    network=sta.network
+                    os.chdir(f"{wd}")
+                    command=f"awk -v network='{network}' -v station='{station}' '$1 != station && $2 != network' {stafile} > output.txt"
+                    os.system(command)
+                    move_cmmd=f"mv -f output.txt {stafile}"
+                    os.system(move_cmmd)
             else:
                 break
-    os.chdir("../")
+    os.chdir(f"{wd}")
     return sta_list
 
 

@@ -44,28 +44,27 @@ class EqtoArrayList:
     def __init__(self,evt):
         self.evt=evt 
         self.array_list=[]
+
     def check_array(self,arr,distRange,minSta):
         "checks if any arrays are within range from earthquake, if so add array to the array list"
         min=distRange[0]
         max=distRange[1]
-        dist=DistAz(arr.pt.loc.lat,arr.pt.loc.lon,self.evt.loc.lat,self.evt.loc.lon)
+        dist=DistAz(arr.array.pt.loc.lat,arr.array.pt.loc.lon,self.evt.loc.lat,self.evt.loc.lon)
         distance=abs(dist.delta)
-        count=0
+        is_ok = False
         if distance>min and distance<max:
-            self.truth_count=0
-            for sta in self.sta_list:
-                if is_ok_eq_sta(self,sta,distRange) == True:
-                    self.truth_count+=1
-                    if self.truth_count >= minSta:
-                        self.array_lists.append(arr)
-                        if os.path.exists('grid_pts.txt'):
-                            os.remove('grid_pts.txt')
-                        count+=1
-                        file=open("grid_pts.txt",'a+')
-                        text=(f'gridpoint {count} {arr.pt.loc.lat} {arr.pt.loc.lon}\n')
-                        file.writelines(text)
-                        file.close()
+            sta_count=0
+            for sta in arr.array.sta_list:
+                if is_ok_eq_sta(self.evt,sta,distRange) == True:
+                    sta_count+=1
+                    if sta_count >= minSta:
+                        self.array_list.append(arr)
+                        is_ok = True
                         break
+        return is_ok
+    @property
+    def array_count(self):
+        return len(self.array_list)
 
 class ArrayToEqlist:
     "a list of eq for all arrrays"

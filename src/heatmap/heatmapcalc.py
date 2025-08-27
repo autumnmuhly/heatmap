@@ -35,10 +35,12 @@ def calc_good_arrays(phase_list,
     for phase in phase_list:
         # Distance range of phase, from TauP
         dist = phase_dist_range(phase)
+        #dist = (30, 90)
         if dist is None:
             print(f"Cannot determine phase distance range for {phase}")
             sys.exit(0)
         phaseToDist[phase] = dist
+        #print(f'this is whats in phaseToDist {phaseToDist}')
     partial_calc = functools.partial(calc_one_array, phaseToDist, eq_list, min_station, min_eq_needed)
 
     with Pool(processes=(os.process_cpu_count()-1)) as pool:
@@ -108,19 +110,21 @@ def run_calc(args):
 
     print(f'this is the len of array list {len(array_list)}')
     good_arrays = calc_good_arrays(args.phases, array_list, eq_list, args.minsta, args.mineq)
-    
+    print(f'this is the len of how many arrays are good {len(good_arrays)}')
+
+
     with open('eq_list','w') as file1:
         for arr in good_arrays:
             for evt in arr.eqlists:
                 #eq sub array here we create eq to array pair. and throw away stations that dont work for that eq. like time interval doesnt overlap
-                text=(f'{evt.time}\n')
+                text=(f'{evt.time} \n')
                 file1.writelines(text)
     
     #for arr in good_arrays:
         #print(arr.ArrayToEqlist)
         #for sta in arr.array.sta_list:
             #print(sta.name)
-    print(f'this is the len of how many arrays are good {len(good_arrays)}')
+
     os.system("awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' eq_list | awk  '{print $0}' > temp_sta")
     os.system("mv -f temp_sta eq_list")
     mydata={
@@ -136,6 +140,7 @@ def run_calc(args):
         "station_list": station_list,
         "radius_point_deg": args.arrayradius,
         "radius_of_earth": 6371,
+        "minsta": args.minsta,
         "num_pts": args.grid
     }
         
