@@ -87,14 +87,14 @@ def plot():
     #for pt in mydata.grid_array:
         #plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=15, c=0,cmap=cm.cool,norm=norm,alpha=.2)
 
-    #for arr in mydata.good_arrays:
-        #arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
+    for arr in mydata.good_arrays:
+        arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
         #circle=matplotlib.patches.Circle((arr.array.pt.loc.lon,arr.array.pt.loc.lat),radius=mydata.arrayradius,alpha=.2)
         #ax.add_patch(circle)
         #plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20,c='red',transform=ccrs.PlateCarree())
     #need to edit plotting a little bit to plot the values. plotting all grid points seperate from those with value
-    #cbar=fig.colorbar(arr_scatter)
-    # cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
+    cbar=fig.colorbar(arr_scatter)
+    cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
     #ax.set_extent([-93.5, -87.4, 29, 34], crs=ccrs.PlateCarree())
     plt.savefig('minieq.png', dpi=700, bbox_inches='tight', pad_inches=0.1)
     return plt.show()

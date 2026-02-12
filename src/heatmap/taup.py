@@ -62,12 +62,13 @@ def taup_time(degrees, phases, sourcedepth=0, model=None, amp=False):
     else:
         ph = phases
     cmd = f"taup time --deg {deg} -p {ph} -h {sourcedepth}"
-#cmd = f"{TAUP_PATH}/taup time --deg {deg} -p {ph} -h {sourcedepth}"
+    # cmd = f"{TAUP_PATH}/taup time --deg {deg} -p {ph} -h {sourcedepth}"
     if model is not None:
         cmd += f" --mod {model}"
     if amp:
         cmd += " --amp"
     taupjson = getTauPAsJson(cmd)
+    #taupjson = getTauPAsJson(cmd_pierce)
     return taupjson
 
 def phase_dist_range(phase, sourcedepth=0, model=None):
@@ -92,6 +93,8 @@ def phase_dist_range(phase, sourcedepth=0, model=None):
                 dist = (min(360-minDist, 360-maxDist), max(360-minDist, 360-maxDist))
 
     return dist
+
+
 
 def main():
     # calculate travel times and parse the output json.
