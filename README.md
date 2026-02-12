@@ -1,6 +1,3 @@
-stop stalking me
-
-if you've made it this far i assume ur stalking me :)
 Heatmap creates heat maps for where on earth is the best place to go 'hunting' for seismic phases. In addition, it can act as an array former. 
 
 Check for dependencies and create environment  
@@ -26,15 +23,30 @@ optional inputs:
 to plot:  
 heatmapplot  
 
+Station List:
+If you already have sac files for an earthquake you can use creatSTA.py in prep_scripts
+
+Event List:
+If you don't have an event list an example for creating one is given in prep_script 
+
+-----------------------
+Array Information
+
 to prepare files for array processing:  
+
 prepvespa  
 - returns a list of grid points, stations, basestations, and eq catalog  
 
-station file:
-if you need to create a station file
+
 
 Grid spacing:
 we use the fibanocci lattice for evenly (as much as possible) spaced grid points. for a chart on number of points and grid spacing please refer to the resources folder. would also like to add a photo of this information here but i dont know how to do that yet so please just look at the grid spacing folder
 
 array configriation, array radius:
-1 degree at the poles looks different than 1 degree at the equator. it is recommend that the array radius is 2-2.5 times the grid spacing to ensure proper sampling. this will also ensure that the grid point used to form the array is the best possible grid point in the suite to represent the array. 
+1 degree at the poles looks different than 1 degree at the equator. it is recommend that the array radius is 2-2.5 times the grid spacing to ensure proper sampling. this will also ensure that the grid point used to form the array is the best possible grid point in the suite to represent the array. we are currently working on improving array configuartion and deleting duplicates by looking at sapital distribution and density of stations in an array.
+
+Future Work:
+We are curently working on a pierce point finder. Ideally you will specify the part of the earth you are interested in i.e. core mantle bounday and heatmaper will then tell you which gridpoints are best. You will be able to add back azimuth constraints. 
+
+Happy Heatmapping!:)
+Please email me with any questions: amuhly@email.sc.edu 
