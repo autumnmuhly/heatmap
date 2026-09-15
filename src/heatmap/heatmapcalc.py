@@ -3,11 +3,11 @@ import jsonpickle
 from multiprocessing import Pool
 import functools
 import os
-
+from datetime import datetime
 from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
 from .mesh_setup import latlon_cartesian,cart_latlon, radius_per_gridpoint
-from .gridpoint import Gridpoint,Station,EQ,Location
-from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist,is_array_gp_okay
+from .gridpoint import Gridpoint,Station,EQ,Location,MetaData
+from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist,is_array_gp_okay,calcBasestation
 from .distaz import DistAz
 from .read_datafiles import (
     read_stations_adept, read_earthquakes_adept,
@@ -16,6 +16,7 @@ from .read_datafiles import (
 from .taup import (
    phase_dist_range, taup_time, taup_phase
    )
+from .arrConfig import calcArthCenter
 
 def calc_one_array(phaseToDist, eq_list, min_station, min_eq_needed, arr ):
     arrToEQ = ArrayToEqlist(arr)
@@ -34,8 +35,9 @@ def calc_good_arrays(phase_list,
     phaseToDist = {}
     for phase in phase_list:
         # Distance range of phase, from TauP
-        dist = phase_dist_range(phase)
-        #dist = (30, 90)
+        #dist = phase_dist_range(phase,sourcedepth=0,model='prem')
+        dist = (60, 185)
+        print(dist)
         if dist is None:
             print(f"Cannot determine phase distance range for {phase}")
             sys.exit(0)
@@ -75,6 +77,7 @@ def parseArgs():
 
 def run_calc(args):
 
+    version = 'version 0.0.1Beta'
     radius_point_deg=radius_per_gridpoint(args.grid)
     print(f'array radius, {args.arrayradius} and gridpoint spacing, {radius_point_deg}')
     if args.arrayradius < radius_point_deg:
@@ -115,10 +118,16 @@ def run_calc(args):
 
     with open('eq_list','w') as file1:
         for arr in good_arrays:
+            calcArthCenter(arr)
+            calcBasestation(arr)
+            #print(f'this is base station {arr.basestation}')
             for evt in arr.eqlists:
                 #eq sub array here we create eq to array pair. and throw away stations that dont work for that eq. like time interval doesnt overlap
                 text=(f'{evt.time} \n')
                 file1.writelines(text)
+
+    creationDate=datetime.now()
+    metaData=MetaData(version,creationDate)
     
     #for arr in good_arrays:
         #print(arr.ArrayToEqlist)
@@ -132,7 +141,7 @@ def run_calc(args):
         "grid_array": grid_array,
         "good_arrays": good_arrays,
         "phase": args.phases,
-        "dist": phase_dist_range(args.phases),
+        "dist": phase_dist_range(args.phases,model='prem'),
         "arrayradius": args.arrayradius,
         "min_sta_per_array": args.minsta,
         "min_eq_at_array": args.mineq,
@@ -140,8 +149,8 @@ def run_calc(args):
         "station_list": station_list,
         "radius_point_deg": args.arrayradius,
         "radius_of_earth": 6371,
-        "minsta": args.minsta,
-        "num_pts": args.grid
+        "num_pts": args.grid,
+        "meta_data":metaData
     }
         
         

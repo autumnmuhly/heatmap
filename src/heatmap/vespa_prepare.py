@@ -4,9 +4,16 @@ import sys
 import os
 import jsonpickle
 from types import SimpleNamespace
+import argparse
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description='extracts the files needed to beam form from json files')
+    parser.add_argument('-f', '--filename', help="which json file to read in", default='heatmap.json')
+    return parser.parse_args()
 
 def prepare_vespa():
-    infilename = "heatmap.json"
+    args = parseArgs()
+    infilename = args.filename
     with open(infilename, "r") as inf:
         mydata = jsonpickle.decode(inf.read())
     mydata = SimpleNamespace(mydata)
@@ -22,7 +29,7 @@ def prepare_vespa():
         for arr in mydata.good_arrays:
             count_array+=1
             #create base station list
-            bs_text={f'{arr.array.basestation.netwrk} {arr.array.basestation.name} {format(arr.array.basestation.loc.lat,'.4f')} {format(arr.array.basestation.loc.lon,'.4f')}\n'}
+            bs_text={f'{arr.basestation.netwrk} {arr.basestation.name} {format(arr.basestation.loc.lat,'.4f')} {format(arr.basestation.loc.lon,'.4f')}\n'}
             file1.writelines(bs_text)
             #create gridpoint list
             lat_array=format(arr.array.pt.loc.lat,'.4f')
@@ -30,14 +37,12 @@ def prepare_vespa():
             gp_text=(f'{count_array} {lat_array} {lon_array}\n')
             file2.writelines(gp_text)
             #create station list
-            for sta in arr.sta_newlist:
+            for sta in arr.good_sta_list:
                 sta_list_total.append(sta)
                 text=(f'{sta.netwrk} {sta.name} {0.0} {sta.loc.lat} {sta.loc.lon} {0.0} {0.0} {sta.start} {sta.stop}\n')
                 file3.writelines(text)
-    command=f"awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' station_list_total > temp_sta"
-    os.system(command)
-    rm_command=f"mv -f temp_sta station_list_total"
-    os.system(rm_command)
+    os.system("awk '!seen[$0]++' station_list_total > temp")
+    os.system("mv temp station_list_total")
     return 
 
 def main():

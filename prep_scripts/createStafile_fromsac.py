@@ -1,13 +1,17 @@
 #create sta file for heatmap if sac files already exist. must run script in directory of sac files. output is sta_info.txt
 import obspy
 from obspy.clients.fdsn import Client
+from obspy.clients.fdsn import RoutingClient
 import os
 from obspy import UTCDateTime
 
 if os.path.exists('sta_info.txt'):
     os.remove('sta_info.txt')
 st = obspy.read('*.sac', debug_headers=True)
-client=Client('IRIS')
+try:
+    client=Client('HL')
+except:
+    client=RoutingClient("iris-federator")
 file=open("sta_info.txt",'a+')
 text=('network staname loc lat lon elv dp start end\n')
 file.writelines(text)

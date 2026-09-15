@@ -74,14 +74,18 @@ def taup_time(degrees, phases, sourcedepth=0, model=None, amp=False):
 def phase_dist_range(phase, sourcedepth=0, model=None):
     phaseDesc = taup_phase(phase, sourcedepth, model)
     dist = None
+    #print(phaseDesc)
     if 'descriptions' in phaseDesc and len(phaseDesc['descriptions']) > 0:
         minDist = float(phaseDesc['descriptions'][0]['minexists']['dist'])
         maxDist = float(phaseDesc['descriptions'][0]['maxexists']['dist'])
         delta = maxDist - minDist
+        #print(delta)
         if delta >= 360:
             dist = (0, 180)
         else:
+            # print(f'this is maxDist {maxDist}')
             maxDist = (maxDist-1) % 360 +1 # 0<maxDist<=360
+            # print(f'updated maxDist {maxDist}')
             minDist = minDist % 360        # 0<=minDist<360
             if minDist < 180 and maxDist <= 180:
                 dist = (minDist, maxDist)

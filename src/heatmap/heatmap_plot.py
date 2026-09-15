@@ -33,9 +33,7 @@ def plot():
         print('there are no eq within range. change eq list')
         sys.exit()
     max_value=max(eq_count)
-    #refernce points
-    north_pole=heatmap.Location(90,0)
-    south_pole=heatmap.Location(-90,0)
+    
 
     #Plot on sphere of earth
     fig = plt.figure()
@@ -65,27 +63,27 @@ def plot():
     #plot on 2D map
     print('starting to plot 2D')
     plt.figure()
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    #ax.coastlines(resolution='10m')
+    ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
+    
     ax.add_feature(cfeature.OCEAN, color='lightskyblue')
     ax.add_feature(cfeature.LAND, color="oldlace")
-    gridlines=ax.gridlines(draw_labels=True, alpha=.80)
+    
+    #gridlines=ax.gridlines(draw_labels=True, alpha=.80)
     plt.title(f'pts:{mydata.num_pts} rad:{mydata.arrayradius} phase:{mydata.phase}')
-    #for sta in mydata.station_list:
-        #plt.scatter(sta.loc.lon,sta.loc.lat, marker='v', s=20, color='green')
-    for arr in mydata.good_arrays:
-        for sta in arr.sta_newlist:
-            plt.scatter(sta.loc.lon, sta.loc.lat, marker='v', s=20, color='tomato')
-    #for evt in mydata.eq_list:
-        #plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='yellow')
+    
+    # for arr in mydata.good_array:
+    #     plt.scatter(arr.pt.loc.lon,arr.pt.loc.lat, marker='v', s=20, color='yellow')
+
+    # for arr in mydata.good_arrays:
+    #     for sta in arr.sta_newlist:
+    #         plt.scatter(sta.loc.lon, sta.loc.lat, marker='v', s=10, color='tomato')
     for arr in mydata.good_arrays:
         #plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o',s=10,color='purple')
         for evt in arr.eqlists:
-            #print(evt.time)
-            plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=20,color='#01153e')
-    
-    #for pt in mydata.grid_array:
-        #plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=15, c=0,cmap=cm.cool,norm=norm,alpha=.2)
+            plt.scatter(evt.loc.lon,evt.loc.lat,marker='o',s=1,color='#01153e')
+
+    # for pt in mydata.grid_array:
+    #     plt.scatter(pt.loc.lon,pt.loc.lat, marker='o', s=15, c=0,cmap=cm.cool,norm=norm,alpha=.2)
 
     for arr in mydata.good_arrays:
         arr_scatter=plt.scatter(arr.array.pt.loc.lon,arr.array.pt.loc.lat,marker='o', s=20, c=arr.eqcount,cmap=cm.cool, norm=norm,transform=ccrs.PlateCarree())
@@ -96,13 +94,12 @@ def plot():
     cbar=fig.colorbar(arr_scatter)
     cbar.set_label(f'Number of earthquakes in {",".join(mydata.phase)} range at grid point', rotation=90)
     #ax.set_extent([-93.5, -87.4, 29, 34], crs=ccrs.PlateCarree())
-    plt.savefig('minieq.png', dpi=700, bbox_inches='tight', pad_inches=0.1)
-    return plt.show()
+    saved_fig=plt.savefig('sta_plots.png', dpi=900, bbox_inches='tight', pad_inches=0.1)
+    return saved_fig
 
 
 def main():
     plt=plot()
-    plt.show()
 
 if __name__ == '__main__':
     sys.exit(main())

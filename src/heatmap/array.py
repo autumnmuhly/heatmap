@@ -2,9 +2,9 @@
 from multiprocessing import Pool
 import functools
 import os
-
 from .mesh_setup import latlon_cartesian,cart_latlon
 from .distaz import DistAz
+from .arrConfig import calcArthCenter
 
 def is_ok_eq_sta(evt,sta,distRange):
     "Takes in an eq and checks if sta/pt is existed at time of event and if the stations are within range"
@@ -15,11 +15,19 @@ def is_ok_eq_sta(evt,sta,distRange):
         gc=abs(dist.delta)
         if min_dist<gc<max_dist:
             return True
-        #else:
-            #print("not ok distance eq_sta")
-    #else:
-        #print(f'not ok time eq_sta {sta.start} {evt.time} {sta.stop}')
     return False
+
+def calcBasestation(array):
+    "Takes in a list of stations, finds the most arthimetic center and calculates what station is closest"
+    # calcArthCenter(array)
+    # print(f'this is array center {array.center}')
+    closest_dist=400
+    for sta in array.good_sta_list:
+        dist=DistAz(array.center.lat,array.center.lon,sta.loc.lon,sta.loc.lat)
+        dist_sta_cent=dist.delta
+        if dist_sta_cent< closest_dist:
+            closest_dist=dist.delta
+            array.basestation=sta
 
 def is_array_gp_okay(arr,spacing):
     x=0
@@ -72,7 +80,8 @@ class ArrayToEqlist:
         self.array=array
         self.eqlists=[]
         self.eqcount=len(self.eqlists)
-        self.sta_newlist=[]
+        self.good_sta_list=[]
+        self.piercepoints={}
     def check_eq(self,evt,distRange,minSta):
         "checks if any events are within range from array, if so count 1 for that array and add event to eqlist"
         min=distRange[0]
@@ -81,17 +90,19 @@ class ArrayToEqlist:
         distance=abs(dist.delta)
         if distance>min and distance<max:
             self.truth_count=0
+            counted_eq = False
             for sta in self.array.sta_list:
                 #print(f'we are looking at {sta.name}')
                 if is_ok_eq_sta(evt,sta,distRange) == True:
                     #print(f'this {sta.name} made it ')
                     #print('checking if sta in array and evt are in right distance and start time')
-                    self.sta_newlist.append(sta)
+                    self.good_sta_list.append(sta)
                     self.truth_count+=1
-                    if self.truth_count >= minSta:
+
+                    if self.truth_count >= minSta and not counted_eq:
                         self.eqcount +=1 #is now adding one to the grid point if all stations meet the criteria
                         self.eqlists.append(evt)
-                        break
+                        counted_eq = True
         return True
 
 class EqArrayPair:
@@ -119,12 +130,13 @@ class Array:
         self.sta_array_list=[]
         self.basestation=basestation
         self.station_distances=station_distances
+
 def form_array(sta_list,pt,radius):
     sta_array_list=[]
     sta_distance=[]
     sta_dist = {}
     min_dist=361
-    basestation=None
+    central_sta=None
     for sta in sta_list:
         dist=DistAz(pt.loc.lat,pt.loc.lon,sta.loc.lat,sta.loc.lon)
         pt_sta=abs(dist.delta)
@@ -132,9 +144,9 @@ def form_array(sta_list,pt,radius):
             sta_array_list.append(sta)
             sta_dist[sta] = pt_sta
             if pt_sta<min_dist:
-                basestation=sta
+                central_sta=sta
                 min_dist=pt_sta
-    return Array(pt,radius,sta_dist, basestation)
+    return Array(pt,radius,sta_dist)
 
 
 def inner_form_array(sta_list, radius, pt):
@@ -207,15 +219,9 @@ def group_items_by_dist(loc_list, point_list, minRadius, maxRadius, minSuccessfu
             good_lists.append( (point, found_list) )
     return good_lists
 
-#where all the thins have a .time attribute
-#sta.time=[start,end]
-#evt.time=[origintime,origintime]
-#grid_point.time=None
-
-#def time_overlaps(timerangea,timerangeb):
-    #where timeable is a point in time 
-    #if timerangea or timerangeb is None:
-        #return True
-    #if timerangea.max<timerangeb.min || timerangea.min> timerangeb.max:
-     #       return False
-    #return True
+class PiercePoint:
+    def __init__(self,time,lat,lon,depth):
+        self.time=time
+        self.lat=lat
+        self.lon=lon
+        self.depth=depth

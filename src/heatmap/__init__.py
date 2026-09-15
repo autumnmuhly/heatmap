@@ -3,7 +3,7 @@ __version__="0.0.1"
 from .mesh_create import find_neighbors,fibonacci_sphere,create_gridpoint
 from .mesh_setup import latlon_cartesian,cart_latlon, radius_per_gridpoint
 from .gridpoint import Gridpoint,Station,EQ,Location
-from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist
+from .array import Array,form_all_array,ArrayToEqlist,EqtoArrayList,EqGridAssignment,form_eq,group_items_by_dist,items_in_dist,PiercePoint,calcBasestation
 from .distaz import DistAz
 from .read_datafiles import (
     read_stations_adept, read_earthquakes_adept,
@@ -16,6 +16,7 @@ from .taup import (
 from .heatmapsummary import summary
 from .heatmap_plot import plot
 from .vespa_prepare import prepare_vespa
+from .arrConfig import Center,calcArthCenter,calcGeomedian
 
 __all__=[
     "find_neighbors",
@@ -46,5 +47,10 @@ __all__=[
     "taup_phase",
     "summary",
     "plot",
-    "prepare_vespa"
+    "prepare_vespa",
+    "PiercePoint",
+    "calcArthCenter",
+    "Center",
+    "calcBasestation",
+    "calcGeomedian"
 ]

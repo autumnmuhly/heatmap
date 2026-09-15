@@ -6,125 +6,87 @@ from obspy import UTCDateTime
 import obspy
 from obspy.clients.fdsn import Client
 import statistics
+import sys 
+from displacement_velocity import displacement_velocity
+import argparse
+import subprocess
+from heatmap import Station,Location
 
 class SacStream:
-    def __init__(self, stanm, network):
+    def __init__(self, stanm,network,channel,lat,lon,start,stop):
         "Sac files have a sta name, min and max amp"
         self.stanm = stanm
         self.network=network
+        self.channel=channel
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description='creates dir, cp files, runs heatmap, and prepares for looper')
+    parser.add_argument('-c', '--channel', help="component, R T or Z default is R", default='R' )
+    parser.add_argument('-e', '--eventname', help="eventname", required=True )
+    return parser.parse_args()
+
 
 def readStaFile(stafile):
     sta_list = []
-    #check for station duplicates using awk 
     command=f"awk -F, '!seen[$1>$2 ? $1 FS $2 : $2 FS $1]++' {stafile} > temp_sta"
     os.system(command)
     rm_command=f"mv -f temp_sta {stafile}"
     os.system(rm_command)
-    #extract sta info from file
     with open('station_list_total', "r") as infile:
-        headerline = infile.readline() # ignore this one
+        #headerline = infile.readline() # ignore this one
         for line in infile:
             items = line.split()
-            sta_list.append(SacStream(items[0],items [1]))
+            loc=Location(items[3],items[4])
+            start=f'{items[7]}{items[8]}'
+            stop=f'{items[9]}{items[10]}'
+            sta_list.append(Station(items[1],items[0],loc,start,stop))
     return sta_list
 
-def check_sacfiles(stafile):
+def check_grabsacfile(station,evt_name):
     """
     Removes sac files with bad amplitude value.
-    takes in a station list txt file
+    takes in a single sac file. retruns a list of sacfiles that are not broken.
     """
-    #extract station info from file
-    sta_list=readStaFile(stafile)
-    
-    #get min and max amplitudes for sac files
-    for sta in sta_list:
-            #change directories
-            wd=os.getcwd()
-            os.chdir(f"sac")
-            filepath=f'*.{sta.stanm}.{sta.network}*R.D.sac'
-            if os.path.exists(filepath):
-                stream=obspy.read(f'*.{sta.stanm}.{sta.network}*R.D.sac',debug_headers=True) #ending of .sac file is adept specific
-                min=stream[0].stats.sac.depmin
-                max=stream[0].stats.sac.depmax
-                if min == 0 or min == "nan" or max == 0 or max == "nan":
-                    print(f'needs to be deleted {sta.stanm}')
-                    station=sta.stanm
-                    network=sta.network
-                    os.chdir(f"{wd}")
-                    command=f"awk -v network='{network}' -v station='{station}' '$1 != station && $2 != network' {stafile} > output.txt"
-                    os.system(command)
-                    move_cmmd=f"mv -f output.txt {stafile}"
-                    os.system(move_cmmd)
-            else:
+    wd=os.getcwd()
+    wd_adept=(f"/usc/data/ADEPT/{evt_name}")
+    channel='R'
+    stream=[]
+    try:
+        os.chdir(wd_adept)
+        stream=obspy.read(f'*.{station.name}.{station.netwrk}*{channel}.D.sac',debug_headers=True) #ending of .sac file is adept specific
+    except:
+         print(f'having trouble reading in {station.name}.{station.netwrk}')
+    if len(stream) != 0:
+        for st in stream:
+            start=st.stats.starttime
+            newtrace=st.trim(start+1600,start+2400)
+            #print(newtrace.stats.npts)
+            if newtrace.stats.npts ==0:
+                print(f'{station.name}.{station.netwrk} is empty')
                 break
-    os.chdir(f"{wd}")
-    return sta_list
-
-
-def grab_sacfiles(checked_list,evt_name):
-    for sacfile in checked_list:
-        #print(f"cp /usc/data/ADEPT/{evt_name}/*{sacfile.stanm}.{sacfile.network}*R.D.sac .")
-        #os.system('pwd')
-        print(f"cp sac/{evt_name}.{sacfile.stanm}.{sacfile.network}*R.D.sac .")
-        os.system(f"cp sac/{evt_name}.{sacfile.stanm}.{sacfile.network}*R.D.sac .")
-        #os.system(f"cp /usc/data/ADEPT/{evt_name}/*{checked_list[i][0]}.{checked_list[i][1]}*R.D.sac .")
+            max=newtrace.max()
+            if min == 0 or min == "nan" or max == 0 or max == "nan":
+                print(f'{station.name} needs to be deleted')
+                break
+            else:
+                with open(f'{wd}/new_sta_list','a') as file1:
+                        text=(f'{station.netwrk} {station.name} {0.0} {station.loc.lat} {station.loc.lon} {0.0} {0.0} {station.start} {sta.stop}\n')
+                        os.system(f"cp /usc/data/ADEPT/{evt_name}/{evt_name}.{station.name}.{station.netwrk}*R.D.sac {wd}")
+                        file1.writelines(text)
+    os.chdir(wd)
     return
 
 
-infilename = "heatmap.json"
-with open(infilename, "r") as inf:
-    mydata = jsonpickle.decode(inf.read())
-    mydata = SimpleNamespace(mydata)
+args = parseArgs()
+channel=args.channel
+eq_name = args.eventname
+wd=os.getcwd()
+all_stations=readStaFile('station_list_total')
 
-
-#get event date 
-for arr in mydata.good_arrays:
-    for evt in arr.eqlists:
-        eq_name=UTCDateTime(evt.time).strftime("%Y%m%d%H%M")
-        #delete sta that dont have data
-        #check to make sure station count is still good)
-
-
-#cd to diretory with sac files 
-#get rid of bad sac files
-check_stalist=check_sacfiles('station_list_total')
-grab_sacfiles(check_stalist,eq_name)
-
-
-#check to make sure station count is still good???
-
-
-
-
-
-
-
-
-
-
+for sta in all_stations:
+    check_grabsacfile(sta,eq_name)
     
-# st = obspy.read('*.sac', debug_headers=True)
-# sacfiles=[]
-# for sacfile in st:   
-#     sacfiles.append(SacStream(sacfile.stats.sac.kstnm.strip(),sacfile.stats.sac.depmin,sacfile.stats.sac.depmax))
-    # stanm=sacfile.stats.sac.kstnm.strip()+''
-    # time_beg=sacfile.stats.sac.b
-    # time_end=sacfile.stats.sac.e
-    # depmin.append(sacfile.stats.sac.depmin)
-    # depmax=sacfile.stats.sac.depmax
-    # file=open("STA_AMP_LIST.txt",'a+')
-    # text=(f'{cnt} {stanm} {depmin} {depmax}\n')
-    # file.writelines(text)
-    # file.close()             
-# mins=[]
-# for str in sacfiles:
-#     mins.append(str.depmin)
-# med_min=statistics.median(mins)
-# print(med_min)
+#displacement_velocity(eq_name)
 
-# bad_sta=[]
-# for str in sacfiles:
-#     if str.depmin == 0 or str.depmin == "nan" or str.depmax == 0 or str.depmax == "nan":
-#         print(f'{str.stanm} {str.depmin} {str.depmax}')
-#     else: 
-#         bad_sta.append(str.stanm)
+
+

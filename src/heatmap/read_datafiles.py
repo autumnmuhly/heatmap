@@ -36,7 +36,7 @@ def read_earthquakes_adept(filepath):
     eventid datetime name mag magtype lat lon depth np1_strike np1_dip np1_rake
     """
     eq_list = []
-    if filepath.startswith("All"):
+    if filepath.startswith(("All", "ENAM")):
         with open(filepath, "r") as infile:
             headerline = infile.readline() # ignore this one
             for line in infile:
@@ -52,25 +52,7 @@ def read_earthquakes_adept(filepath):
                 #strike = float(items[7]) if items[8] != "None" else None
                 #dip = float(items[8]) if items[9] != "None" else None
                 #rake = float(items[9]) if items[10] != "None" else None
-                eq = EQ(loc, time)
-                eq_list.append(eq)
-    if filepath.startswith("19"):
-        with open(filepath, "r") as infile:
-            headerline = infile.readline() # ignore this one
-            for line in infile:
-                items = line.split()
-                time = datetime.fromisoformat(items[1])
-                name = items[0]
-                mag = float(items[3]) #all_events
-                magtype = items[4]
-                lat = float(items[5]) #all_events
-                lon = float(items[6]) #all_events
-                loc = Location(lat, lon)
-                depth = float(items[7]) #all_events
-                #strike = float(items[7]) if items[8] != "None" else None
-                #dip = float(items[8]) if items[9] != "None" else None
-                #rake = float(items[9]) if items[10] != "None" else None
-                eq = EQ(loc, time)
+                eq = EQ(loc,depth,time)
                 eq_list.append(eq)
     else:
         with open(filepath, "r") as infile:
@@ -93,7 +75,7 @@ def read_earthquakes_adept(filepath):
                 #strike = float(items[7]) if items[8] != "None" else None
                 #dip = float(items[8]) if items[9] != "None" else None
                 #rake = float(items[9]) if items[10] != "None" else None
-                eq = EQ(loc, time)
+                eq = EQ(loc,depth, time)
                 eq_list.append(eq)
     return eq_list
 
