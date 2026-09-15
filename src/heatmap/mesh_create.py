@@ -8,8 +8,10 @@ from .gridpoint import Gridpoint
 from .mesh_setup import fibonacci_sphere
 from .mesh_setup import find_neighbors,cart_latlon
 
-def create_gridpoint(number_points):
-    radius_of_earth=6378 
+def create_gridpoint(number_points,radius=None):
+    if radius is None:
+        radius_of_earth=6378 
+    radius_of_earth=radius
     points=(fibonacci_sphere(number_points))*radius_of_earth
 
     def appendSpherical_np(xyz):
