@@ -54,8 +54,8 @@ def run_heatmap(event_ID):
             subprocess.run(['cp', '/home/amuhly/majorarc/All.stations', '.'])
             subprocess.run(['cp', f'/usc/data/ADEPT/Info/{evt}.event', '.'])
             #os.chdir(wd)
-            os.system('cp /home/amuhly/majorarc/All.stations .')
-            os.system(f'cp /usc/data/ADEPT/Info/{evt}.event .')
+            # os.system('cp /home/amuhly/majorarc/All.stations .')
+            # os.system(f'cp /usc/data/ADEPT/Info/{evt}.event .')
             # For yellowstone
             #os.system(f'heatmapcalc -s All.stations -e {evt}.event --minsta 20 --grid 40000 --arrayradius 1.4 -p SKS,SKKKKS --region -98 -83 33 41')
             os.system(f'heatmapcalc -s All.stations -e {evt}.event --minsta 20 --grid 40000 --arrayradius 1.0 -p SKKKKS')
