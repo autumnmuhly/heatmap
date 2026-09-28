@@ -40,7 +40,7 @@ def cart_latlon(x, y, z):
     longitude=longitude*180/pi
     return latitude,longitude 
 
-def latlon_cartesian(lat,lon):
+def latlon_cartesian(lat,lon,depth=0):
     R=6378
     r = R - depth
     lat=np.radians(lat)
