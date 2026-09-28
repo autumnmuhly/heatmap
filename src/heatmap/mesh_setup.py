@@ -42,11 +42,12 @@ def cart_latlon(x, y, z):
 
 def latlon_cartesian(lat,lon):
     R=6378
+    r = R - depth
     lat=np.radians(lat)
     lon=np.radians(lon)
-    x = R*np.cos(lat)*np.cos(lon)
-    y = R*np.cos(lat)*np.sin(lon)
-    z = R*np.sin(lat)
+    x = r*np.cos(lat)*np.cos(lon)
+    y = r*np.cos(lat)*np.sin(lon)
+    z = r*np.sin(lat)
     return Cartesian(x,y,z)
 
 class Neighbors:
