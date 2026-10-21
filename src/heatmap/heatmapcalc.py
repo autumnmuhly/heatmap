@@ -35,8 +35,8 @@ def calc_good_arrays(phase_list,
     phaseToDist = {}
     for phase in phase_list:
         # Distance range of phase, from TauP
-        #dist = phase_dist_range(phase,sourcedepth=0,model='prem')
-        dist = (60, 185)
+        dist = phase_dist_range(phase,sourcedepth=0,model='prem')
+        #dist = (60, 185)
         print(dist)
         if dist is None:
             print(f"Cannot determine phase distance range for {phase}")
@@ -48,7 +48,6 @@ def calc_good_arrays(phase_list,
     with Pool(processes=(os.process_cpu_count()-1)) as pool:
         arrayToeq = pool.map(partial_calc, array_list)
     #loop over array in array list to decided if enough eq exist to be considered an array
-        
     good_arrays=[]
     for arr in arrayToeq:
         if arr.eqcount>=min_eq_needed:
