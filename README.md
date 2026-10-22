@@ -3,7 +3,8 @@ Heatmap creates heat maps for where on earth is the best place to go 'hunting' f
 Check for dependencies and create environment
 - conda create -n spam
 - conda activate spam
-- pip install pip install -v -e .
+- conda install pip (?)
+- pip install -v -e .
 
 test example:
 - cd example
