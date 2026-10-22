@@ -1,8 +1,13 @@
 Heatmap creates heat maps for where on earth is the best place to go 'hunting' for seismic phases. In addition, it can act as an array former. 
 
-Check for dependencies and create environment  
+Check for dependencies and create environment
+- conda create -n spam
+- conda activate spam
 - pip install pip install -v -e .
 
+test example:
+- cd example
+- heatmapcalc -s All.stations -e 201511260545.event
 to run:  
 
 heatmapcalc -s stationfilename -e eqcatalogfilename --minsta 1 --mineq 1 --phase S  
