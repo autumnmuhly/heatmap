@@ -58,7 +58,7 @@ def calc_good_arrays(phase_list,
     return good_arrays
 
 def parseArgs():
-    parser = argparse.ArgumentParser(prog='HeatmapCalc',
+    parser = argparse.ArgumentParser(prog='SpamCalc',
                     description='Finds arrays for beamforming',
                     epilog='Text at the bottom of help')
     parser.add_argument('-p', '--phases', nargs="+", help="phases of interest", required=True)
@@ -69,7 +69,7 @@ def parseArgs():
     parser.add_argument('--arrayradius', type=float, default=5.0, help="radius of array in degrees")
     parser.add_argument('--minsta', type=int, default=1, help="min number of stations near a grid point to form an array")
     parser.add_argument('--mineq', type=int, default=1, help="min number of earthquakes at an array to be successful")
-    parser.add_argument('-o', '--outfile', default="heatmap.json", help="output file")
+    parser.add_argument('-o', '--outfile', default="spam.json", help="output file")
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     return parser.parse_args()
 

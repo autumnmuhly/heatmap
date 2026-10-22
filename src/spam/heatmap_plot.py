@@ -13,12 +13,12 @@ import datetime
 import sys
 import jsonpickle
 from types import SimpleNamespace
-import heatmap
+import spam
 import matplotlib
 from matplotlib.patches import Circle
 
 def plot():
-    infilename = "heatmap.json"
+    infilename = "spam.json"
     with open(infilename, "r") as inf:
         mydata = jsonpickle.decode(inf.read())
     mydata = SimpleNamespace(mydata)

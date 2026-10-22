@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#run this file after heatmapcalc to get files needed to run beamforming script
+#run this file after spamcalc to get files needed to run beamforming script
 import sys
 import os
 import jsonpickle
@@ -8,7 +8,7 @@ import argparse
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='extracts the files needed to beam form from json files')
-    parser.add_argument('-f', '--filename', help="which json file to read in", default='heatmap.json')
+    parser.add_argument('-f', '--filename', help="which json file to read in", default='spam.json')
     return parser.parse_args()
 
 def prepare_vespa():

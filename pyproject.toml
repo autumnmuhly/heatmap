@@ -3,7 +3,7 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "heatmap"
+name = "spam"
 dynamic = ["version"]
 authors = [
   { name="Autumn Muhly", email="amuhly@email.sc.edu" },
@@ -27,16 +27,16 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/autumnmuhly/heatmap"
-Documentation = "https://heatmap.readthedocs.io"
-Repository = "https://github.com/autumnmuhly/heatmap"
-Issues = "https://github.com/autumnmuhly/heatmap/issues"
+Homepage = "https://github.com/autumnmuhly/spam"
+Documentation = "https://spam.readthedocs.io"
+Repository = "https://github.com/autumnmuhly/spam"
+Issues = "https://github.com/autumnmuhly/spam/issues"
 
 [project.scripts]
-"heatmapcalc" = "heatmap.heatmapcalc:main"
-"heatmapsummary" = "heatmap.heatmapsummary:main"
-"heatmapplot" = "heatmap.heatmap_plot:main"
-"prepvespa" = "heatmap.vespa_prepare:main"
+"spamcalc" = "spam.spamcalc:main"
+"spamsummary" = "spam.spamsummary:main"
+"spamplot" = "spam.spam_plot:main"
+"prepvespa" = "spam.vespa_prepare:main"
 
 [tool.pytest.ini_options]
 addopts = [
@@ -44,6 +44,6 @@ addopts = [
     ]
 
 [tool.hatch.version]
-path = "src/heatmap/__init__.py"
+path = "src/spam/__init__.py"
 [tool.hatch.build.targets.wheel]
-packages = ["src/heatmap"]
+packages = ["src/spam"]

@@ -8,7 +8,7 @@ import jsonpickle
 from types import SimpleNamespace
 
 def summary(args):
-    infilename = args.heatmapfile
+    infilename = args.spamfile
     with open(infilename, "r") as inf:
         mydata = jsonpickle.decode(inf.read())
     mydata = SimpleNamespace(mydata)
@@ -25,10 +25,10 @@ def summary(args):
 
 
 def parseArgs():
-    parser = argparse.ArgumentParser(prog='HeatmapCalc',
+    parser = argparse.ArgumentParser(prog='SpamCalc',
                     description='Finds arrays for beamforming',
                     epilog='Text at the bottom of help')
-    parser.add_argument('-f', '--heatmapfile', default="heatmap.json", help="input file")
+    parser.add_argument('-f', '--spamfile', default="spam.json", help="input file")
     parser.add_argument('--arrays', action='store_true', help="print arrays")
 
     return parser.parse_args()
