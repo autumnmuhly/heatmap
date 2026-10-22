@@ -13,8 +13,8 @@ from .taup import (
    phase_dist_range, taup_time, taup_phase
    )
 
-from .heatmapsummary import summary
-from .heatmap_plot import plot
+from .spamsummary import summary
+from .spam_plot import plot
 from .vespa_prepare import prepare_vespa
 from .arrConfig import Center,calcArthCenter,calcGeomedian
 
